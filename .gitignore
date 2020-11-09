@@ -1,2 +1,8 @@
 *.class
+*.classpath
 *.log
+*.jar
+
+# IntelliJ files
+*.iml
+*.idea
