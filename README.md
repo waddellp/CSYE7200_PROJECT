@@ -22,4 +22,6 @@ Data sets available through multiple formats:<br>
 Data sets include:<br>
 - Latitude, longitude, magnitude, depth, geographical region, timestamp
 
-~10,000 rows of data (+1..0 magnitude) per month~120,000 rows of data per year~1.2 million rows of data per decade
+10,000 rows of data (+1..0 magnitude) per month<br>
+120,000 rows of data per year<br>
+1.2 million rows of data per decade
