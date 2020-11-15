@@ -57,4 +57,52 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
       DateTime("2020-10-31T22:10:60.880Z")
     }
   }
+
+  behavior of "Location"
+  /**
+   * Test successful parsing of the Location data (latitude/longitude/place)
+   */
+  it should "work for lat/long/place" in {
+    val x = Location(List("-89.0", "179.0", "Antarctica"))
+    x should matchPattern {
+      case Location(-89.0, 179.0, "Antarctica") =>
+    }
+  }
+  /**
+   * Test failures for parsing of the Location data
+   */
+  it should "not work for invalid latitude" in {
+    assertThrows[Exception] { // Expect Exception
+      Location(List("bad_latitude", "179.0", "Antarctica"))
+    }
+  }
+  it should "not work for invalid longitude" in {
+    assertThrows[Exception] { // Expect Exception
+      Location(List("-89.0", "bad_longitude", "Antarctica"))
+    }
+  }
+
+  behavior of "Magnitude"
+  /**
+   * Test successful parsing of the Magnitude data (magnitude, units, depth)
+   */
+  it should "work for magnitude/unit/depth" in {
+    val x = Magnitude(List("1.66", "ml", "16.67"))
+    x should matchPattern {
+      case Magnitude(1.66, "ml", 16.67) =>
+    }
+  }
+  /**
+   * Test failures for parsing of the Magnitude data
+   */
+  it should "not work for invalid magnitude" in {
+    assertThrows[Exception] { // Expect Exception
+      Magnitude(List("bad_magnitude", "ml", "16.67"))
+    }
+  }
+  it should "not work for invalid depth [km]" in {
+    assertThrows[Exception] { // Expect Exception
+      Magnitude(List("1.66", "ml", "bad_depth"))
+    }
+  }
 }
