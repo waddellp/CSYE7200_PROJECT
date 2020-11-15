@@ -1,7 +1,6 @@
 package edu.neu.coe.csye7200.proj
 
-import org.scalatest.matchers.Matchers
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Northeastern University
@@ -15,4 +14,11 @@ import org.scalatest.FlatSpec
  */
 class USGeoSurveySpec extends FlatSpec with Matchers {
 
+  behavior of "DateTime"
+  it should "work for params" in {
+    val x = DateTime("2020-10-31T22:10:35.880Z")
+    x should matchPattern {
+      case DateTime(2020, 10, 31, 22, 10, 35) =>
+    }
+  }
 }

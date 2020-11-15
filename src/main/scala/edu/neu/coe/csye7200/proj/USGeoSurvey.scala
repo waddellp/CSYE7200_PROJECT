@@ -48,7 +48,7 @@ case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, sec
 
 object DateTime {
   // this regex will not parse the UTC (Zulu time) in the dataset
-  val rDateTime = """^[1-2]{1}\d{3}-[0-1]{1}\d{1}-[0-3]{1}\d{1}T[0-1]{1}\d{1}:[0-5]{1}\d{1}:[0-5]{1}\d{1}\.\d{3}Z$""".r
+  val rDateTime = """^([1-2]{1}\d{3})-([0-1]{1}\d{1})-([0-3]{1}\d{1})T([0-2]{1}\d{1}):([0-5]{1}\d{1}):([0-5]{1}\d{1})\.\d{3}Z$""".r
 
   def apply(datetime: String): DateTime = datetime match {
     case rDateTime(year, month, day, hour, minute, second) => apply(year.toInt, month.toInt, day.toInt, hour.toInt, minute.toInt, second.toInt)
