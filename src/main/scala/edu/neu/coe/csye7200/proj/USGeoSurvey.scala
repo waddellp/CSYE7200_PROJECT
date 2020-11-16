@@ -1,7 +1,7 @@
 package edu.neu.coe.csye7200.proj
 
 import scala.collection.mutable
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 import scala.io.{Codec, Source}
 
 /**
@@ -190,8 +190,24 @@ object USGeoSurvey extends App {
    * @return a try of sequence of USGeoSurvey data
    */
   def getQuakesDateRange(seismicEvents: Iterator[Try[USGeoSurvey]], start: DateTime, end: DateTime): Try[Seq[USGeoSurvey]] = {
-    val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
-      for (u: USGeoSurvey <- ut; if u.isEarthquake; if u.datetime less end; if start less u.datetime) yield u
-    sequence(for (uy <- usy; if uy.isSuccess) yield uy)
+    for (qs <- getQuakes(seismicEvents))
+      yield qs.filter(q => (q.datetime less end) && (start less q.datetime))
+  }
+
+
+  /**
+   * Method to get a sequence of US Geological Survey data that is only of type 'earthquake' and falls between a
+   * date/time range and it is within the area around a location
+   *
+   * @param seismicEvents the US Geological Survey data to use
+   * @param start the start of the date/time range to get
+   * @param end the end of the date/time range to get
+   * @param location the location from which to search around
+   * @param radius the radius around the location to search within
+   * @return a try of sequence of USGeoSurvey data
+   */
+  def getQuakesDateRangeLocation(seismicEvents: Iterator[Try[USGeoSurvey]], start: DateTime, end: DateTime, location: Location, radius: Double): Try[Seq[USGeoSurvey]] = {
+    for(qs <- getQuakesDateRange(seismicEvents, start, end))
+      yield qs.filter(q => (q.location.distance(location) <= radius))
   }
 }
