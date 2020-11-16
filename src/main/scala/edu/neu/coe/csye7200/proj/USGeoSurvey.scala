@@ -130,19 +130,6 @@ object USGeoSurvey extends App {
   implicit object ParsibleUSGeoSurvey extends ParsibleUSGeoSurvey
 
   /**
-   * Form a list from the elements explicitly specified (by position) from the given list
-   *
-   * @param list    a list of Strings
-   * @param indices a variable number of index values for the desired elements
-   * @return a list of Strings containing the specified elements in order
-   */
-  def elements(list: Seq[String], indices: Int*): List[String] = {
-    val x = mutable.ListBuffer[String]()
-    for (i <- indices) x += list(i)
-    x.toList
-  }
-
-  /**
    * Alternative apply method for the US Geological Survey class
    *
    * @param ws a sequence of Strings
@@ -151,22 +138,12 @@ object USGeoSurvey extends App {
   def apply(ws: Seq[String]): USGeoSurvey = {
     val id = ws(11)
     val datetime = DateTime(ws(0))
-    val location = Location(elements(ws, 1, 2, 13))
-    val magnitude = Magnitude(elements(ws, 4, 5, 3))
+    val location = Location(Function.elements(ws, 1, 2, 13))
+    val magnitude = Magnitude(Function.elements(ws, 4, 5, 3))
     val eventtype = ws(15)
     USGeoSurvey(id, datetime, location, magnitude, eventtype)
   }
 
-  /**
-   * Method to convert a Sequence of Try of X to a Try of Sequence of X
-   *
-   * @param xys the sequence of try of X
-   * @tparam X the class to convert
-   * @return a try of sequnce of X
-   */
-  def sequence[X](xys: Seq[Try[X]]): Try[Seq[X]] = (Try(Seq[X]()) /: xys) {
-    (xsy, xy) => for (xs <- xsy; x <- xy) yield xs :+ x
-  }
 
   /**
    * Method to get a sequence of US Geological Survey data that is only of type 'earthquake'
@@ -177,7 +154,7 @@ object USGeoSurvey extends App {
   def getEarthquakes(seismicEvents: Iterator[Try[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
     val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
       for (u: USGeoSurvey <- ut; if u.isEarthquake) yield u
-    sequence(for (uy <- usy; if uy.isSuccess) yield uy)
+    Function.sequence(for (uy <- usy; if uy.isSuccess) yield uy)
   }
 
   /**
