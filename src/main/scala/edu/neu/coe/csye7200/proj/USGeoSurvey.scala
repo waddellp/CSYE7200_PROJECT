@@ -207,4 +207,14 @@ object USGeoSurvey extends App {
     for(qs <- earthquakes)
       yield qs.filter(q => (q.location.distance(location) <= radius))
   }
+
+  /**
+   * Method to sort the US Geological Survey data by magnitude
+   * @param earthquakes the US Geological Survey data earthquake list
+   * @return USGeoSurvey data sorted by magnitude
+   */
+  def sortByMagnitude(earthquakes: Try[Seq[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
+    for(qs <- earthquakes) yield qs.sortBy(_.magnitude.magnitude).reverse
+  }
+
 }

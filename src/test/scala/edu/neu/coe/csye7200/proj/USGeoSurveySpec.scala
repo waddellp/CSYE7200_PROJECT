@@ -200,4 +200,21 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     qrl.get.size shouldBe 658
     source.close()
   }
+
+  behavior of "USGeoSurvey.sortByMagnitude"
+  it should "return largest earthquake in Alaska during Oct. 2020" in {
+    // There was a major, 7.6 magnitude, earthquake in the Alaska Peninsula on Oct. 19th
+    // as well as many aftershocks afterward
+    implicit val codec = Codec.UTF8
+    val parser = new DataParse[USGeoSurvey]()
+    val source = Source.fromResource("USGS-Oct2020.csv")
+    val testdata = parser(source)
+    val q = USGeoSurvey.getEarthquakes(testdata)
+    val qr = USGeoSurvey.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
+    val qrl = USGeoSurvey.getLocationArea(qr, Location(54.662, -159.675, "Alaska Peninsula"), 50.0)
+    val qrls = USGeoSurvey.sortByMagnitude(qrl)
+    //qrls.get.take(1).foreach(q => q.magnitude.magnitude shouldBe 7.6)
+    qrls.get.take(1) andThen ( q => q.magnitude.magnitude shouldBe 7.6 )
+    source.close()
+  }
 }
