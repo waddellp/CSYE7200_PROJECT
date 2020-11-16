@@ -126,6 +126,16 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     }
   }
 
+  behavior of "Location.distance"
+  /**
+   * Test distance calculation between two Location (latitude/longitude) points
+   */
+  it should "work for distance between Boston and NYC" in {
+    val boston = Location(42.3584, -71.0598,"Boston, MA")
+    val nyc = Location(40.7143, -74.006, "New York City, NY")
+    boston.distance(nyc) shouldBe 305.836 +- 0.001 // ~306 kilometers (as the bird flys) between Boston & NYC
+  }
+
   behavior of "Magnitude"
   /**
    * Test successful parsing of the Magnitude data (magnitude, units, depth)

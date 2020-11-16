@@ -34,6 +34,22 @@ case class Location(latitude: Double, longitude: Double, place: String) {
   override def toString = {
     s"$latitude,$longitude,$place"
   }
+
+  /**
+   * Method to return the distance between two locations
+   * @param location the location from which to find the distance to
+   * @return the distance in kilometers
+   */
+  def distance(location: Location ): Double =  {
+    def rad(x: Double) = x * Math.PI / 180.0
+    val R = 6371.0; // Earth’s mean radius in kilometers
+    val dLat = rad(location.latitude - this.latitude)
+    val dLong = rad(location.longitude - this.longitude)
+    val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(rad(this.latitude)) * Math.cos(rad(location.latitude)) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2)
+    R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  }
 }
 
 object Location {
