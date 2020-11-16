@@ -122,7 +122,7 @@ object USGeoSurvey extends App {
    */
   def elements(list: Seq[String], indices: Int*): List[String] = {
     val x = mutable.ListBuffer[String]()
-    for(i <- indices) x += list(i)
+    for (i <- indices) x += list(i)
     x.toList
   }
 
@@ -143,6 +143,7 @@ object USGeoSurvey extends App {
 
   /**
    * Method to convert a Sequence of Try of X to a Try of Sequence of X
+   *
    * @param xys the sequence of try of X
    * @tparam X the class to convert
    * @return a try of sequnce of X
@@ -153,12 +154,28 @@ object USGeoSurvey extends App {
 
   /**
    * Method to get a sequence of US Geological Survey data that is only of type 'earthquake'
+   *
    * @param seismicEvents the US Geological Survey data to use
    * @return a try of sequence of USGeoSurvey data
    */
-  def getEarthquakes(seismicEvents: Iterator[Try[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
-    val usy = for(ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
-      for(u: USGeoSurvey <- ut; if u.isEarthquake) yield u
-    sequence(for(uy <- usy; if uy.isSuccess) yield uy)
+  def getQuakes(seismicEvents: Iterator[Try[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
+    val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
+      for (u: USGeoSurvey <- ut; if u.isEarthquake) yield u
+    sequence(for (uy <- usy; if uy.isSuccess) yield uy)
+  }
+
+  /**
+   * Method to get a sequence of US Geological Survey data that is only of type 'earthquake' and falls between a
+   * date/time range
+   *
+   * @param seismicEvents the US Geological Survey data to use
+   * @param start the start of the date/time range to get
+   * @param end the end of the date/time range to get
+   * @return a try of sequence of USGeoSurvey data
+   */
+  def getQuakesDateRange(seismicEvents: Iterator[Try[USGeoSurvey]], start: DateTime, end: DateTime): Try[Seq[USGeoSurvey]] = {
+    val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
+      for (u: USGeoSurvey <- ut; if u.isEarthquake; if u.datetime less end; if start less u.datetime) yield u
+    sequence(for (uy <- usy; if uy.isSuccess) yield uy)
   }
 }

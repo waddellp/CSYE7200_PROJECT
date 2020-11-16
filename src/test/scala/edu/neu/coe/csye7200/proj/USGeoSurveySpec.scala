@@ -150,14 +150,25 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of "USGeoSurvey.getEarthquakes"
+  behavior of "USGeoSurvey.getQuakes"
   it should "work for the Oct2020 test data" in {
     val parser = new DataParse[USGeoSurvey]()
     implicit val codec = Codec.UTF8
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val msy = USGeoSurvey.getEarthquakes(parser(source))
+    val msy = USGeoSurvey.getQuakes(parser(source))
     msy should matchPattern { case Success(_) => }
     msy.get.size shouldBe 10113
+    source.close()
+  }
+
+  behavior of "USGeoSurvey.getQuakesDateRange"
+  it should "return results only from Oct. 31st" in {
+    val parser = new DataParse[USGeoSurvey]()
+    implicit val codec = Codec.UTF8
+    val source = Source.fromResource("USGS-Oct2020.csv")
+    val msy = USGeoSurvey.getQuakesDateRange(parser(source), DateTime("2020-10-31T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
+    msy should matchPattern { case Success(_) => }
+    msy.get.size shouldBe 208
     source.close()
   }
 
