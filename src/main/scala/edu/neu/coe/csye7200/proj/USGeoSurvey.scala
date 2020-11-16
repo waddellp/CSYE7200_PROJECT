@@ -53,7 +53,28 @@ object Location {
  * @param second the second of the seismic event
  */
 case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) {
+  /**
+   * Override default toString method
+   * @return
+   */
   override def toString = { "%1$04d-%2$02d-%3$02d %4$02d:%5$02d:%6$02dZ".format(year,month,day,hour,minute,second) }
+
+  /**
+   * Comparison method for DateTime
+   * @param datetime the date/time to compare to
+   * @return true if the provided DateTime is greater than this, otherwise false
+   */
+  def less(datetime: DateTime): Boolean = {
+    if ((year < datetime.year) ||
+        (year == datetime.year && month < datetime.month) ||
+        (year == datetime.year && month == datetime.month && day < datetime.day) ||
+        (year == datetime.year && month == datetime.month && day == datetime.day && hour < datetime.hour) ||
+        (year == datetime.year && month == datetime.month && day == datetime.day && hour == datetime.hour && minute < datetime.minute) ||
+        (year == datetime.year && month == datetime.month && day == datetime.day && hour == datetime.hour && minute == datetime.minute && second < datetime.second))
+      true
+    else
+      false
+  }
 }
 
 object DateTime {

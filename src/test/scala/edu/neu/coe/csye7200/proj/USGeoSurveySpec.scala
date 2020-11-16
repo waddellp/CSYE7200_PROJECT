@@ -61,6 +61,47 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     }
   }
 
+  behavior of "DateTime.less"
+  /**
+   * Test successful comparison method of the UTC date/time
+   */
+  it should "work for year date/time less than another date/time" in {
+    val after = DateTime("2020-10-31T22:10:35.880Z")
+    val before = DateTime("2019-10-31T22:10:35.880Z")
+    before.less(after) shouldBe true
+    after.less(before) shouldBe false
+  }
+  it should "work for month date/time less than another date/time" in {
+    val after = DateTime("2020-10-31T22:10:35.880Z")
+    val before = DateTime("2020-09-31T22:10:35.880Z")
+    before.less(after) shouldBe true
+    after.less(before) shouldBe false
+  }
+  it should "work for day date/time less than another date/time" in {
+    val after = DateTime("2020-10-31T22:10:35.880Z")
+    val before = DateTime("2020-10-30T22:10:35.880Z")
+    before.less(after) shouldBe true
+    after.less(before) shouldBe false
+  }
+  it should "work for hour date/time less than another date/time" in {
+    val after = DateTime("2020-10-31T22:10:35.880Z")
+    val before = DateTime("2020-10-31T21:10:35.880Z")
+    before.less(after) shouldBe true
+    after.less(before) shouldBe false
+  }
+  it should "work for minute date/time less than another date/time" in {
+    val after = DateTime("2020-10-31T22:10:35.880Z")
+    val before = DateTime("2020-10-31T22:09:35.880Z")
+    before.less(after) shouldBe true
+    after.less(before) shouldBe false
+  }
+  it should "work for second date/time less than another date/time" in {
+    val after = DateTime("2020-10-31T22:10:35.880Z")
+    val before = DateTime("2020-10-31T22:10:34.880Z")
+    before.less(after) shouldBe true
+    after.less(before) shouldBe false
+  }
+
   behavior of "Location"
   /**
    * Test successful parsing of the Location data (latitude/longitude/place)
