@@ -1,7 +1,8 @@
 package edu.neu.coe.csye7200.proj
 
 import scala.collection.mutable
-import scala.util.Try
+import scala.util.{Success, Try}
+import scala.io.{Codec, Source}
 
 /**
  * Northeastern University
@@ -42,8 +43,17 @@ object Location {
   }
 }
 
+/**
+ * Case clase - the UTC date/time for US Geological Survey seismic data
+ * @param year the year of the seismic event
+ * @param month the month of the seismic event
+ * @param day the day of the seismic event
+ * @param hour the hour of the seismic event
+ * @param minute the minute of the seismic event
+ * @param second the second of the seismic event
+ */
 case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) {
-  override def toString = { s"$year%4d-$month%2d-$day%2d $hour%2d:$minute%2d:$second%dZ" }
+  override def toString = { "%1$04d-%2$02d-%3$02d %4$02d:%5$02d:%6$02dZ".format(year,month,day,hour,minute,second) }
 }
 
 object DateTime {
@@ -57,12 +67,12 @@ object DateTime {
 }
 
 /**
- * Case class - US Geological Survey seismic data measuring magnitude of the event
+ * Case class - The magnitude data associated with the US Geological Survey seismic data
  * @param magnitude the magnitude of the seismic event
  * @param units the unit of measurement for the magnitude
  */
 case class Magnitude(magnitude: Double, units: String, depth: Double) {
-  s"$magnitude[$units]"
+  override def toString = { s"$magnitude[$units],$depth[km]" }
 }
 
 object Magnitude {
@@ -106,7 +116,28 @@ object USGeoSurvey extends App {
     val datetime = DateTime(ws(0))
     val location = Location(elements(ws, 1, 2, 13))
     val magnitude = Magnitude(elements(ws, 4, 5, 3))
-    val eventtype = ws(17)
+    val eventtype = ws(15)
     USGeoSurvey(id, datetime, location, magnitude, eventtype)
+  }
+
+  /**
+   * Method to convert a Sequence of Try of X to a Try of Sequence of X
+   * @param xys the sequence of try of X
+   * @tparam X the class to convert
+   * @return a try of sequnce of X
+   */
+  def sequence[X](xys: Seq[Try[X]]): Try[Seq[X]] = (Try(Seq[X]()) /: xys) {
+    (xsy, xy) => for (xs <- xsy; x <- xy) yield xs :+ x
+  }
+
+  /**
+   * Method to get a sequence of US Geological Survey data that is only of type 'earthquake'
+   * @param seismicEvents the US Geological Survey data to use
+   * @return a try of sequence of USGeoSurvey data
+   */
+  def getEarthquakes(seismicEvents: Iterator[Try[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
+    val usy = for(ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
+      for(u: USGeoSurvey <- ut; if u.isEarthquake) yield u
+    sequence(for(uy <- usy; if uy.isSuccess) yield uy)
   }
 }

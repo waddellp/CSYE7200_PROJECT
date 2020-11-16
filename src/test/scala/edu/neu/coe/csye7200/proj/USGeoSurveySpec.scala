@@ -2,6 +2,9 @@ package edu.neu.coe.csye7200.proj
 
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.io.{Codec, Source}
+import scala.util.Success
+
 /**
  * Northeastern University
  * CSYE 7200 - Big Data System Engineering Using Scala
@@ -105,4 +108,16 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
       Magnitude(List("1.66", "ml", "bad_depth"))
     }
   }
+
+  behavior of "USGeoSurvey.getEarthquakes"
+  it should "work for the Oct2020 test data" in {
+    val parser = new DataParse[USGeoSurvey]()
+    implicit val codec = Codec.UTF8
+    val source = Source.fromResource("USGS-Oct2020.csv")
+    val msy = USGeoSurvey.getEarthquakes(parser(source))
+    msy should matchPattern { case Success(_) => }
+    msy.get.size shouldBe 10113
+    source.close()
+  }
+
 }

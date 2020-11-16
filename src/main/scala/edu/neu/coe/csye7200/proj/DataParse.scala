@@ -11,7 +11,7 @@ import scala.util.Try
  * @author Rajendra kumar Rajkumar [001405755]
  */
 
-class DataParse1 [T: Parsible] extends (Source => Iterator[Try[T]]) {
+class DataParse [T: Parsible] extends (Source => Iterator[Try[T]]) {
   def apply(source: Source): Iterator[Try[T]] =
     source.getLines.toSeq.drop(1).map(e => implicitly[Parsible[T]].fromString(e)).iterator
 }
