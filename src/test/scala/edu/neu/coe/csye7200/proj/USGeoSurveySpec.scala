@@ -162,23 +162,26 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
 
   behavior of "USGeoSurvey.getQuakes"
   it should "work for the Oct2020 test data" in {
-    val parser = new DataParse[USGeoSurvey]()
     implicit val codec = Codec.UTF8
+    val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val msy = USGeoSurvey.getQuakes(parser(source))
-    msy should matchPattern { case Success(_) => }
-    msy.get.size shouldBe 10113
+    val testdata = parser(source)
+    val q = USGeoSurvey.getEarthquakes(testdata)
+    q should matchPattern { case Success(_) => }
+    q.get.size shouldBe 10113
     source.close()
   }
 
   behavior of "USGeoSurvey.getQuakesDateRange"
   it should "return results only from Oct. 31st" in {
-    val parser = new DataParse[USGeoSurvey]()
     implicit val codec = Codec.UTF8
+    val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val msy = USGeoSurvey.getQuakesDateRange(parser(source), DateTime("2020-10-31T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
-    msy should matchPattern { case Success(_) => }
-    msy.get.size shouldBe 208
+    val testdata = parser(source)
+    val q = USGeoSurvey.getEarthquakes(testdata)
+    val qr = USGeoSurvey.getDateRange(q, DateTime("2020-10-31T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
+    qr should matchPattern { case Success(_) => }
+    qr.get.size shouldBe 208
     source.close()
   }
 
@@ -186,20 +189,15 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
   it should "return results only from October 19th in Alaska" in {
     // There was a major, 7.6 magnitude, earthquake in the Alaska Peninsula on Oct. 19th
     // as well as many aftershocks afterward
-    val parser = new DataParse[USGeoSurvey]()
     implicit val codec = Codec.UTF8
+    val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val msy =
-      USGeoSurvey.getQuakesDateRangeLocation(
-        parser(source),
-        DateTime("2020-10-19T00:00:00.000Z"),
-        DateTime("2020-10-26T23:59:59.000Z"),
-        Location(54.662,-159.675, "Alaska Peninsula"),
-        50.0 // kilometers
-      )
-    msy should matchPattern { case Success(_) => }
-    msy.get.size shouldBe 658
-    for( m <- msy.get ) println (m)
+    val testdata = parser(source)
+    val q = USGeoSurvey.getEarthquakes(testdata)
+    val qr = USGeoSurvey.getDateRange(q, DateTime("2020-10-19T00:00:00.000Z"), DateTime("2020-10-26T23:59:59.000Z"))
+    val qrl = USGeoSurvey.getLocationArea(qr, Location(54.662,-159.675, "Alaska Peninsula"), 50.0)
+    qrl should matchPattern { case Success(_) => }
+    qrl.get.size shouldBe 658
     source.close()
   }
 }
