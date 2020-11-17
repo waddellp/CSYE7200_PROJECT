@@ -68,38 +68,38 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
   it should "work for year date/time less than another date/time" in {
     val after = DateTime("2020-10-31T22:10:35.880Z")
     val before = DateTime("2019-10-31T22:10:35.880Z")
-    before.less(after) shouldBe true
-    after.less(before) shouldBe false
+    before < after shouldBe true
+    after < before shouldBe false
   }
   it should "work for month date/time less than another date/time" in {
     val after = DateTime("2020-10-31T22:10:35.880Z")
     val before = DateTime("2020-09-31T22:10:35.880Z")
-    before.less(after) shouldBe true
-    after.less(before) shouldBe false
+    before < after shouldBe true
+    after < before shouldBe false
   }
   it should "work for day date/time less than another date/time" in {
     val after = DateTime("2020-10-31T22:10:35.880Z")
     val before = DateTime("2020-10-30T22:10:35.880Z")
-    before.less(after) shouldBe true
-    after.less(before) shouldBe false
+    before < after shouldBe true
+    after < before shouldBe false
   }
   it should "work for hour date/time less than another date/time" in {
     val after = DateTime("2020-10-31T22:10:35.880Z")
     val before = DateTime("2020-10-31T21:10:35.880Z")
-    before.less(after) shouldBe true
-    after.less(before) shouldBe false
+    before < after shouldBe true
+    after < before shouldBe false
   }
   it should "work for minute date/time less than another date/time" in {
     val after = DateTime("2020-10-31T22:10:35.880Z")
     val before = DateTime("2020-10-31T22:09:35.880Z")
-    before.less(after) shouldBe true
-    after.less(before) shouldBe false
+    before < after shouldBe true
+    after < before shouldBe false
   }
   it should "work for second date/time less than another date/time" in {
     val after = DateTime("2020-10-31T22:10:35.880Z")
     val before = DateTime("2020-10-31T22:10:34.880Z")
-    before.less(after) shouldBe true
-    after.less(before) shouldBe false
+    before < after shouldBe true
+    after < before shouldBe false
   }
 
   behavior of "Location"
@@ -213,7 +213,6 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     val qr = USGeoSurvey.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
     val qrl = USGeoSurvey.getLocationArea(qr, Location(54.662, -159.675, "Alaska Peninsula"), 50.0)
     val qrls = USGeoSurvey.sortByMagnitude(qrl)
-    //qrls.get.take(1).foreach(q => q.magnitude.magnitude shouldBe 7.6)
     qrls.get.take(1) andThen ( q => q.magnitude.magnitude shouldBe 7.6 )
     source.close()
   }

@@ -68,7 +68,9 @@ object Location {
  * @param minute the minute of the seismic event
  * @param second the second of the seismic event
  */
-case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) {
+case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) extends Ordered[DateTime] {
+  import scala.math.Ordered.orderingToOrdered
+
   /**
    * Override default toString method
    * @return
@@ -77,20 +79,18 @@ case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, sec
 
   /**
    * Comparison method for DateTime
-   * @param datetime the date/time to compare to
-   * @return true if the provided DateTime is greater than this, otherwise false
+   * @param that the date/time to compare to
+   * @return 0 if equal, -1 if this is less than that, and 1 if this is greater than that
    */
-  def less(datetime: DateTime): Boolean = {
-    if ((year < datetime.year) ||
-        (year == datetime.year && month < datetime.month) ||
-        (year == datetime.year && month == datetime.month && day < datetime.day) ||
-        (year == datetime.year && month == datetime.month && day == datetime.day && hour < datetime.hour) ||
-        (year == datetime.year && month == datetime.month && day == datetime.day && hour == datetime.hour && minute < datetime.minute) ||
-        (year == datetime.year && month == datetime.month && day == datetime.day && hour == datetime.hour && minute == datetime.minute && second < datetime.second))
-      true
-    else
-      false
-  }
+  override def compare(that: DateTime): Int =
+    if (this == that) 0
+    else if ((year < that.year) ||
+          (year == that.year && month < that.month) ||
+          (year == that.year && month == that.month && day < that.day) ||
+          (year == that.year && month == that.month && day == that.day && hour < that.hour) ||
+          (year == that.year && month == that.month && day == that.day && hour == that.hour && minute < that.minute) ||
+          (year == that.year && month == that.month && day == that.day && hour == that.hour && minute == that.minute && second < that.second)) -1
+    else 1
 }
 
 object DateTime {
@@ -168,7 +168,7 @@ object USGeoSurvey extends App {
    */
   def getDateRange(earthquakes: Try[Seq[USGeoSurvey]], start: DateTime, end: DateTime): Try[Seq[USGeoSurvey]] = {
     for (qs <- earthquakes)
-      yield qs.filter(q => (q.datetime less end) && (start less q.datetime))
+      yield qs.filter(q => (q.datetime <= end) && (start <= q.datetime))
   }
 
   /**
@@ -182,7 +182,7 @@ object USGeoSurvey extends App {
    */
   def getLocationArea(earthquakes: Try[Seq[USGeoSurvey]], location: Location, radius: Double): Try[Seq[USGeoSurvey]] = {
     for(qs <- earthquakes)
-      yield qs.filter(q => (q.location.distance(location) <= radius))
+      yield qs.filter(q => q.location.distance(location) <= radius)
   }
 
   /**
@@ -193,5 +193,4 @@ object USGeoSurvey extends App {
   def sortByMagnitude(earthquakes: Try[Seq[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
     for(qs <- earthquakes) yield qs.sortBy(_.magnitude.magnitude).reverse
   }
-
 }
