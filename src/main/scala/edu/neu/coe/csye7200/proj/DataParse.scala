@@ -10,7 +10,6 @@ import scala.util.Try
  * @author Patrick Waddell [001058235]
  * @author Rajendra kumar Rajkumar [001405755]
  */
-
 class DataParse [T: Parsible] extends (Source => Iterator[Try[T]]) {
   def apply(source: Source): Iterator[Try[T]] =
     source.getLines.toSeq.drop(1).map(e => implicitly[Parsible[T]].fromString(e)).iterator

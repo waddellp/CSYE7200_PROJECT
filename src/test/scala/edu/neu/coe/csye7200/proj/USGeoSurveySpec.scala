@@ -3,7 +3,7 @@ package edu.neu.coe.csye7200.proj
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.{Codec, Source}
-import scala.util.Success
+import scala.util.{Success, Try}
 
 /**
  * Northeastern University
@@ -160,7 +160,7 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of "USGeoSurvey.getQuakes"
+  behavior of "USGeoSurvey.getEarthquakes"
   it should "work for the Oct2020 test data" in {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
@@ -172,7 +172,7 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     source.close()
   }
 
-  behavior of "USGeoSurvey.getQuakesDateRange"
+  behavior of "USGeoSurvey.getDateRange"
   it should "return results only from Oct. 31st" in {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
@@ -185,7 +185,7 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     source.close()
   }
 
-  behavior of "USGeoSurvey.getQuakesDateRangeLocation"
+  behavior of "USGeoSurvey.getLocationArea"
   it should "return results only from October 19th in Alaska" in {
     // There was a major, 7.6 magnitude, earthquake in the Alaska Peninsula on Oct. 19th
     // as well as many aftershocks afterward
@@ -213,7 +213,20 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     val qr = USGeoSurvey.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
     val qrl = USGeoSurvey.getLocationArea(qr, Location(54.662, -159.675, "Alaska Peninsula"), 50.0)
     val qrls = USGeoSurvey.sortByMagnitude(qrl)
-    qrls.get.take(1) andThen ( q => q.magnitude.magnitude shouldBe 7.6 )
+    qrls.get.toList(0).magnitude.magnitude shouldEqual 7.6
+    source.close()
+  }
+
+  behavior of "USGeoSurvey.getEarthquakeHotspot"
+  it should "return the center of earthquake activity" in {
+    implicit val codec = Codec.UTF8
+    val parser = new DataParse[USGeoSurvey]()
+    val source = Source.fromResource("USGS-Oct2020.csv")
+    val testdata = parser(source)
+    val q = USGeoSurvey.getEarthquakes(testdata)
+    val hs: (USGeoSurvey, Try[Seq[USGeoSurvey]]) = USGeoSurvey.getEarthquakeHotspot(q, 50.0)
+    hs._1.location.place should include ("Ocotillo")
+    hs._2.get.length shouldEqual 1388
     source.close()
   }
 }

@@ -144,7 +144,6 @@ object USGeoSurvey extends App {
     USGeoSurvey(id, datetime, location, magnitude, eventtype)
   }
 
-
   /**
    * Method to get a sequence of US Geological Survey data that is only of type 'earthquake'
    *
@@ -192,5 +191,21 @@ object USGeoSurvey extends App {
    */
   def sortByMagnitude(earthquakes: Try[Seq[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
     for(qs <- earthquakes) yield qs.sortBy(_.magnitude.magnitude).reverse
+  }
+
+  /**
+   * Returns the location of an earthquake that is the center of a lot of earthquake activity
+   * @params earthquakes the US Geological Survey data earthquake list
+   * @return a tuple containing the center of the earthquake hotspot and all it's surrounding activity
+   */
+  def getEarthquakeHotspot(earthquakes: Try[Seq[USGeoSurvey]], radius: Double): (USGeoSurvey, Try[Seq[USGeoSurvey]]) = {
+    earthquakes match {
+      case Success(qs) =>
+        val quakesInArea = for(q <- qs) yield q -> getLocationArea(earthquakes, q.location, radius)
+        val numQuakesInArea = for((_, xs) <- quakesInArea) yield xs match { case Success(x) => x.length }
+        val quakesTuple = quakesInArea zip numQuakesInArea
+        val quakesTupleSorted = quakesTuple.sortBy(_._2)(Ordering[Int].reverse)
+        quakesTupleSorted(1)._1
+    }
   }
 }
