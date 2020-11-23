@@ -54,7 +54,8 @@ case class Location(latitude: Double, longitude: Double, place: String) {
 
 object Location {
   def apply(params: List[String]): Location = params match {
-    case latitude :: longitude :: place :: Nil => apply(latitude.toDouble, longitude.toDouble, place)
+    case latitude :: longitude :: description :: Nil =>
+      apply(latitude.toDouble, longitude.toDouble, description.substring(description.lastIndexOf("of ") + 3))
     case _ => throw new Exception(s"Parse error in location data: $params")
   }
 }
@@ -194,18 +195,21 @@ object USGeoSurvey extends App {
   }
 
   /**
-   * Returns the location of an earthquake that is the center of a lot of earthquake activity
+   * Method to find the top earthquake hotspots around the world
    * @params earthquakes the US Geological Survey data earthquake list
-   * @return a tuple containing the center of the earthquake hotspot and all it's surrounding activity
+   * @return a sequence of tuples containing: the center of the earthquake hotspot, all it's surrounding activity,
+   *         and the number of surrounding events
    */
-  def getEarthquakeHotspot(earthquakes: Try[Seq[USGeoSurvey]], radius: Double): (USGeoSurvey, Try[Seq[USGeoSurvey]]) = {
-    earthquakes match {
-      case Success(qs) =>
-        val quakesInArea = for(q <- qs) yield q -> getLocationArea(earthquakes, q.location, radius)
-        val numQuakesInArea = for((_, xs) <- quakesInArea) yield xs match { case Success(x) => x.length }
-        val quakesTuple = quakesInArea zip numQuakesInArea
-        val quakesTupleSorted = quakesTuple.sortBy(_._2)(Ordering[Int].reverse)
-        quakesTupleSorted(1)._1
-    }
+  def getEarthquakeHotspots(earthquakes: Try[Seq[USGeoSurvey]], radius: Double): Try[Seq[((USGeoSurvey, Try[Seq[USGeoSurvey]]), Int)]] = {
+    val biggestEarthquakes = sortByMagnitude(earthquakes)
+    val eventAndNearby =
+      for (qs <- biggestEarthquakes)
+        yield for (q <- qs.distinctBy(_.location.place).take(100))
+          yield q -> getLocationArea(earthquakes, q.location, radius)
+    val eventNearbyAndCount =
+      for(xs: Seq[(USGeoSurvey, Try[Seq[USGeoSurvey]])] <- eventAndNearby) yield
+        for (x <- xs) yield for (x2 <- x._2) yield x -> x2.length
+    val hotspots = for(n <- eventNearbyAndCount) yield Function.sequence(n)
+    for(hsyy <- hotspots; hsy <- hsyy) yield hsy.sortBy(_._2).reverse
   }
 }

@@ -1,7 +1,8 @@
 package edu.neu.coe.csye7200.proj
 
 import scala.collection.mutable
-import scala.util.Try
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 /**
  * Northeastern University
@@ -37,4 +38,9 @@ object Function {
     (xsy, xy) => for (xs <- xsy; x <- xy) yield xs :+ x
   }
 
+  def flatten[X](xfy: Try[Future[X]]): Future[X] =
+    xfy match {
+      case Success(xf) => xf
+      case Failure(e) => Future.failed(e)
+    }
 }

@@ -107,7 +107,7 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
    * Test successful parsing of the Location data (latitude/longitude/place)
    */
   it should "work for lat/long/place" in {
-    val x = Location(List("-89.0", "179.0", "Antarctica"))
+    val x = Location(List("-89.0", "179.0", "0km East of Antarctica"))
     x should matchPattern {
       case Location(-89.0, 179.0, "Antarctica") =>
     }
@@ -131,8 +131,8 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
    * Test distance calculation between two Location (latitude/longitude) points
    */
   it should "work for distance between Boston and NYC" in {
-    val boston = Location(42.3584, -71.0598,"Boston, MA")
-    val nyc = Location(40.7143, -74.006, "New York City, NY")
+    val boston = Location(42.3584, -71.0598, "0km East of Boston, MA")
+    val nyc = Location(40.7143, -74.006, "0km East of New York City, NY")
     boston.distance(nyc) shouldBe 305.836 +- 0.001 // ~306 kilometers (as the bird flies) between Boston & NYC
   }
 
@@ -217,16 +217,36 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     source.close()
   }
 
-  behavior of "USGeoSurvey.getEarthquakeHotspot"
-  it should "return the center of earthquake activity" in {
+  behavior of "USGeoSurvey.getEarthquakeHotspots"
+  it should "return the top 10 hot spots from Oct. 2020" in {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
     val testdata = parser(source)
     val q = USGeoSurvey.getEarthquakes(testdata)
-    val hs: (USGeoSurvey, Try[Seq[USGeoSurvey]]) = USGeoSurvey.getEarthquakeHotspot(q, 50.0)
-    hs._1.location.place should include ("Ocotillo")
-    hs._2.get.length shouldEqual 1388
+    val hotspots = USGeoSurvey.getEarthquakeHotspots(q, 50.0)
+    val t10 = hotspots.get.take(10)
+    t10.distinctBy(t => t._1._1.location.place).size shouldBe 10
+    t10(0)._1._1.location.place shouldBe "Westmorland"
+    t10(0)._2 shouldBe 1354
+    t10(1)._1._1.location.place shouldBe "Sand Point"
+    t10(1)._2 shouldBe 1118
+    t10(2)._1._1.location.place shouldBe "Adak"
+    t10(2)._2 shouldBe 23
+    t10(3)._1._1.location.place shouldBe "Nikolski"
+    t10(3)._2 shouldBe 17
+    t10(4)._1._1.location.place shouldBe "Levuka"
+    t10(4)._2 shouldBe 16
+    t10(5)._1._1.location.place shouldBe "Sungai Penuh"
+    t10(5)._2 shouldBe 14
+    t10(6)._1._1.location.place shouldBe "Pangai"
+    t10(6)._2 shouldBe 12
+    t10(7)._1._1.location.place shouldBe "Ashkāsham"
+    t10(7)._2 shouldBe 11
+    t10(8)._1._1.location.place shouldBe "Palekastro"
+    t10(8)._2 shouldBe 10
+    t10(9)._1._1.location.place shouldBe "Kokkári"
+    t10(9)._2 shouldBe 10
     source.close()
   }
 }
