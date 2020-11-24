@@ -224,29 +224,28 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
     val source = Source.fromResource("USGS-Oct2020.csv")
     val testdata = parser(source)
     val q = USGeoSurvey.getEarthquakes(testdata)
-    val hotspots = USGeoSurvey.getEarthquakeHotspots(q, 50.0)
-    val t10 = hotspots.get.take(10)
-    t10.distinctBy(t => t._1._1.location.place).size shouldBe 10
-    t10(0)._1._1.location.place shouldBe "Westmorland"
-    t10(0)._2 shouldBe 1354
-    t10(1)._1._1.location.place shouldBe "Sand Point"
-    t10(1)._2 shouldBe 1118
-    t10(2)._1._1.location.place shouldBe "Adak"
-    t10(2)._2 shouldBe 23
-    t10(3)._1._1.location.place shouldBe "Nikolski"
-    t10(3)._2 shouldBe 17
-    t10(4)._1._1.location.place shouldBe "Levuka"
-    t10(4)._2 shouldBe 16
-    t10(5)._1._1.location.place shouldBe "Sungai Penuh"
-    t10(5)._2 shouldBe 14
-    t10(6)._1._1.location.place shouldBe "Pangai"
-    t10(6)._2 shouldBe 12
-    t10(7)._1._1.location.place shouldBe "Ashkāsham"
-    t10(7)._2 shouldBe 11
-    t10(8)._1._1.location.place shouldBe "Palekastro"
-    t10(8)._2 shouldBe 10
-    t10(9)._1._1.location.place shouldBe "Kokkári"
-    t10(9)._2 shouldBe 10
+    val t10 = USGeoSurvey.getEarthquakeHotspots(q, 10).get
+    t10.size shouldBe 10
+    t10(0)._1 shouldBe "Sand Point"
+    t10(0)._2.size shouldBe 1262
+    t10(1)._1 shouldBe "Westmorland"
+    t10(1)._2.size shouldBe 1157
+    t10(2)._1 shouldBe "Mina"
+    t10(2)._2.size shouldBe 585
+    t10(3)._1 shouldBe "Pāhala"
+    t10(3)._2.size shouldBe 310
+    t10(4)._1 shouldBe "Volcano"
+    t10(4)._2.size shouldBe 231
+    t10(5)._1 shouldBe "Searles Valley"
+    t10(5)._2.size shouldBe 184
+    t10(6)._1 shouldBe "Stanley"
+    t10(6)._2.size shouldBe 175
+    t10(7)._1 shouldBe "Adak"
+    t10(7)._2.size shouldBe 165
+    t10(8)._1 shouldBe "Denali National Park"
+    t10(8)._2.size shouldBe 160
+    t10(9)._1 shouldBe "Petersville"
+    t10(9)._2.size shouldBe 116
     source.close()
   }
 }

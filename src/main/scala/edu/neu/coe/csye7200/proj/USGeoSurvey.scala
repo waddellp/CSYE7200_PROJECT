@@ -1,6 +1,6 @@
 package edu.neu.coe.csye7200.proj
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.util.{Failure, Success, Try}
 import scala.io.{Codec, Source}
 
@@ -152,9 +152,8 @@ object USGeoSurvey extends App {
    * @return a try of sequence of USGeoSurvey data
    */
   def getEarthquakes(seismicEvents: Iterator[Try[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
-    val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield
-      for (u: USGeoSurvey <- ut; if u.isEarthquake) yield u
-    Function.sequence(for (uy <- usy; if uy.isSuccess) yield uy)
+    val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield ut.filter(u => u.isEarthquake)
+    Function.sequence(usy.filter(us => us.isSuccess))
   }
 
   /**
@@ -197,19 +196,10 @@ object USGeoSurvey extends App {
   /**
    * Method to find the top earthquake hotspots around the world
    * @params earthquakes the US Geological Survey data earthquake list
-   * @return a sequence of tuples containing: the center of the earthquake hotspot, all it's surrounding activity,
-   *         and the number of surrounding events
+   * @return a sequence of tuples containing: the place of the hotspot, all it's surrounding activity
    */
-  def getEarthquakeHotspots(earthquakes: Try[Seq[USGeoSurvey]], radius: Double): Try[Seq[((USGeoSurvey, Try[Seq[USGeoSurvey]]), Int)]] = {
-    val biggestEarthquakes = sortByMagnitude(earthquakes)
-    val eventAndNearby =
-      for (qs <- biggestEarthquakes)
-        yield for (q <- qs.distinctBy(_.location.place).take(100))
-          yield q -> getLocationArea(earthquakes, q.location, radius)
-    val eventNearbyAndCount =
-      for(xs: Seq[(USGeoSurvey, Try[Seq[USGeoSurvey]])] <- eventAndNearby) yield
-        for (x <- xs) yield for (x2 <- x._2) yield x -> x2.length
-    val hotspots = for(n <- eventNearbyAndCount) yield Function.sequence(n)
-    for(hsyy <- hotspots; hsy <- hsyy) yield hsy.sortBy(_._2).reverse
+  def getEarthquakeHotspots(earthquakes: Try[Seq[USGeoSurvey]], numHotspots: Int): Try[Seq[(String, Seq[USGeoSurvey])]] = {
+      for (qs <- earthquakes)
+        yield qs.groupBy(_.location.place).toSeq.sortBy( x => x._2.size)(Ordering[Int].reverse).take(numHotspots)
   }
 }
