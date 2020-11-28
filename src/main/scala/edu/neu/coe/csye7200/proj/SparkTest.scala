@@ -1,14 +1,9 @@
 package edu.neu.coe.csye7200.proj
 
-import java.io.{InputStream, SequenceInputStream}
-
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-
-import scala.io.Source
-import collection.JavaConverters._
 
 object SparkTest extends App {
 

@@ -1,6 +1,6 @@
 package edu.neu.coe.csye7200.proj
 
-import scala.util.{Try}
+import scala.util.Try
 
 /**
  * Northeastern University
@@ -19,7 +19,7 @@ import scala.util.{Try}
  * @param eventtype the type of seismic event (only 'earthquake' used by this tool)
  */
 case class USGeoSurvey(id: String, datetime: DateTime, location: Location, magnitude: Magnitude, eventtype: String) {
-  def isEarthquake = eventtype equals "earthquake"
+  def isEarthquake: Boolean = eventtype equals "earthquake"
 }
 
 /**
@@ -29,7 +29,7 @@ case class USGeoSurvey(id: String, datetime: DateTime, location: Location, magni
  * @param place the description of the location
  */
 case class Location(latitude: Double, longitude: Double, place: String) {
-  override def toString = {
+  override def toString: String = {
     s"$latitude,$longitude,$place"
   }
 
@@ -68,13 +68,12 @@ object Location {
  * @param second the second of the seismic event
  */
 case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) extends Ordered[DateTime] {
-  import scala.math.Ordered.orderingToOrdered
 
   /**
    * Override default toString method
    * @return
    */
-  override def toString = { "%1$04d-%2$02d-%3$02d %4$02d:%5$02d:%6$02dZ".format(year,month,day,hour,minute,second) }
+  override def toString: String = { "%1$04d-%2$02d-%3$02d %4$02d:%5$02d:%6$02dZ".format(year,month,day,hour,minute,second) }
 
   /**
    * Comparison method for DateTime
@@ -108,7 +107,7 @@ object DateTime {
  * @param units the unit of measurement for the magnitude
  */
 case class Magnitude(magnitude: Double, units: String, depth: Double) {
-  override def toString = { s"$magnitude[$units],$depth[km]" }
+  override def toString: String = { s"$magnitude[$units],$depth[km]" }
 }
 
 object Magnitude {
@@ -136,7 +135,7 @@ object USGeoSurvey extends App with Serializable {
    */
   def apply(ws: Seq[String]): USGeoSurvey = {
     val id = ws(11)
-    val datetime = DateTime(ws(0))
+    val datetime = DateTime(ws.head)
     val location = Location(Function.elements(ws, 1, 2, 13))
     val magnitude = Magnitude(Function.elements(ws, 4, 5, 3))
     val eventtype = ws(15)

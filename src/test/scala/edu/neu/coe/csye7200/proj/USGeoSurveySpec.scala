@@ -2,9 +2,6 @@ package edu.neu.coe.csye7200.proj
 
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.io.{Codec, Source}
-import scala.util.{Success, Try}
-
 /**
  * Northeastern University
  * CSYE 7200 - Big Data System Engineering Using Scala
