@@ -1,10 +1,14 @@
 package edu.neu.coe.csye7200.proj
 
+import java.io.{InputStream, SequenceInputStream}
+
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 import scala.io.Source
+import collection.JavaConverters._
 
 object SparkTest extends App {
 
@@ -16,13 +20,9 @@ object SparkTest extends App {
       .appName("MultipleLinearRegression")
       .master("local[*]")
       .getOrCreate()
-    val sc = spark.sparkContext
+    val sc: SparkContext = spark.sparkContext
 
-    val parser = new DataParse[USGeoSurvey]()
-    val fileStream = Source.getClass.getResourceAsStream("/USGS-2020.csv")
-    val parseData = sc.parallelize(Source.fromInputStream(fileStream).getLines().toSeq map (u => parser(u)))
-    val data: RDD[USGeoSurvey] = parseData flatMap(_.toOption)
-
+    val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val e = ForecasterUtil.getEarthquakes(data)
     val er = ForecasterUtil.getDateRange(e, DateTime("2020-10-19T00:00:00.000Z"), DateTime("2020-10-26T23:59:59.000Z"))
     val erl = ForecasterUtil.getLocationArea(er, Location(54.662,-159.675, "Alaska Peninsula"), 50.0)

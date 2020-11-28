@@ -1,10 +1,47 @@
 package edu.neu.coe.csye7200.proj
 
+import java.io.{InputStream, SequenceInputStream}
+
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scala.util.Try
+import scala.collection.JavaConverters.asJavaEnumeration
+import scala.io.Source
+
+/**
+ * Northeastern University
+ * CSYE 7200 - Big Data System Engineering Using Scala
+ * Project: World Earthquake Forecaster
+ * @author Patrick Waddell [001058235]
+ * @author Rajendra kumar Rajkumar [001405755]
+ */
 
 object ForecasterUtil {
+
+  /**
+   * Loads all the US Geological Survey information
+   * (10 years of data, approx 1 million rows)
+   * @param sc the Spark Context
+   * @return a Spark RDD of USGeoSurvey information
+   */
+  def loadData(sc: SparkContext): RDD[USGeoSurvey] = {
+    val parser = new DataParse[USGeoSurvey]()
+    val files: Seq[InputStream] =
+      Vector(
+        Source.getClass.getResourceAsStream("/USGS-2020.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2019.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2018.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2017.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2016.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2015.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2014.csv"),
+        Source.getClass.getResourceAsStream("/USGS-2013.csv"))
+        //Source.getClass.getResourceAsStream("/USGS-2012.csv"),
+        //Source.getClass.getResourceAsStream("/USGS-2011.csv"),
+        //Source.getClass.getResourceAsStream("/USGS-2010.csv"))
+    val filestream = new SequenceInputStream(asJavaEnumeration(files.toIterator))
+    sc.parallelize(Source.fromInputStream(filestream).getLines().toSeq map (u => parser(u))) flatMap(_.toOption)
+  }
 
   /**
    * Method to get a list of US Geological Survey data that is only of type 'earthquake'
