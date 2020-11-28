@@ -1,5 +1,7 @@
 package edu.neu.coe.csye7200.proj
 
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.{Codec, Source}
@@ -14,15 +16,20 @@ import scala.util.{Success, Try}
  * @author Rajendra kumar Rajkumar [001405755]
  */
 class ForecasterUtilSpec extends FlatSpec with Matchers {
+  val spark = SparkSession.builder()
+    .appName("MultipleLinearRegression")
+    .master("local[*]")
+    .getOrCreate()
+  val sc = spark.sparkContext
 
   behavior of "USGeoSurvey.getEarthquakes"
   it should "work for the Oct2020 test data" in {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val testdata = parser(source)
+    val testdata = sc.parallelize(parser(source))
     val q = ForecasterUtil.getEarthquakes(testdata)
-    q.size shouldBe 10113
+    q.collect.size shouldBe 10113
     source.close()
   }
 
@@ -31,10 +38,10 @@ class ForecasterUtilSpec extends FlatSpec with Matchers {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val testdata = parser(source)
+    val testdata = sc.parallelize(parser(source))
     val q = ForecasterUtil.getEarthquakes(testdata)
     val qr = ForecasterUtil.getDateRange(q, DateTime("2020-10-31T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
-    qr.size shouldBe 208
+    qr.collect.size shouldBe 208
     source.close()
   }
 
@@ -45,27 +52,28 @@ class ForecasterUtilSpec extends FlatSpec with Matchers {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val testdata = parser(source)
+    val testdata = sc.parallelize(parser(source))
     val q = ForecasterUtil.getEarthquakes(testdata)
     val qr = ForecasterUtil.getDateRange(q, DateTime("2020-10-19T00:00:00.000Z"), DateTime("2020-10-26T23:59:59.000Z"))
     val qrl = ForecasterUtil.getLocationArea(qr, Location(54.662,-159.675, "Alaska Peninsula"), 50.0)
-    qrl.size shouldBe 658
+    qrl.collect().size shouldBe 658
     source.close()
   }
 
   behavior of "USGeoSurvey.sortByMagnitude"
   it should "return largest earthquake in Alaska during Oct. 2020" in {
+
     // There was a major, 7.6 magnitude, earthquake in the Alaska Peninsula on Oct. 19th
     // as well as many aftershocks afterward
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val testdata = parser(source)
+    val testdata = sc.parallelize(parser(source))
     val q = ForecasterUtil.getEarthquakes(testdata)
     val qr = ForecasterUtil.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
     val qrl = ForecasterUtil.getLocationArea(qr, Location(54.662, -159.675, "Alaska Peninsula"), 50.0)
     val qrls = ForecasterUtil.sortByMagnitude(qrl)
-    qrls.toList(0).magnitude.magnitude shouldEqual 7.6
+    qrls.collect().toList(0).magnitude.magnitude shouldEqual 7.6
     source.close()
   }
 
@@ -74,9 +82,9 @@ class ForecasterUtilSpec extends FlatSpec with Matchers {
     implicit val codec = Codec.UTF8
     val parser = new DataParse[USGeoSurvey]()
     val source = Source.fromResource("USGS-Oct2020.csv")
-    val testdata = parser(source)
+    val testdata = sc.parallelize(parser(source))
     val q = ForecasterUtil.getEarthquakes(testdata)
-    val t10 = ForecasterUtil.getEarthquakeHotspots(q).take(10)
+    val t10 = ForecasterUtil.getEarthquakeHotspots(q, 10)
     t10.size shouldBe 10
     t10(0)._1 shouldBe "Sand Point"
     t10(0)._2.size shouldBe 1262

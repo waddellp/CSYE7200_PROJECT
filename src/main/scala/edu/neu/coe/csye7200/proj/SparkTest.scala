@@ -23,7 +23,12 @@ object SparkTest extends App {
     val parseData = sc.parallelize(Source.fromInputStream(fileStream).getLines().toSeq map (u => parser(u)))
     val data: RDD[USGeoSurvey] = parseData flatMap(_.toOption)
 
-    println( data.collect().toSeq.take(1).toString() )
+    val e = ForecasterUtil.getEarthquakes(data)
+    val er = ForecasterUtil.getDateRange(e, DateTime("2020-10-19T00:00:00.000Z"), DateTime("2020-10-26T23:59:59.000Z"))
+    val erl = ForecasterUtil.getLocationArea(er, Location(54.662,-159.675, "Alaska Peninsula"), 50.0)
+    val erls = ForecasterUtil.sortByMagnitude(erl)
+
+    println( erls.collect().toSeq.take(1).toString() )
 
     // For implicit conversions like converting RDDs to DataFrames
     //import spark.implicits._
