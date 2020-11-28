@@ -1,5 +1,8 @@
 package edu.neu.coe.csye7200.proj
 
+import org.apache.spark.rdd.RDD
+
+import scala.:+
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -35,7 +38,7 @@ object Function {
    * @return a try of sequnce of X
    */
   def sequence[X](xys: Seq[Try[X]]): Try[Seq[X]] = (Try(Seq[X]()) /: xys) {
-    (xsy, xy) => for (xs <- xsy; x <- xy) yield xs :+ x
+    (xsy, xy) => for (xs: Seq[X] <- xsy; x <- xy) yield xs :+ x
   }
 
   def flatten[X](xfy: Try[Future[X]]): Future[X] =

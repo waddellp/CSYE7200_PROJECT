@@ -120,7 +120,7 @@ object Magnitude {
   }
 }
 
-object USGeoSurvey extends App {
+object USGeoSurvey extends App with Serializable {
 
   trait ParsibleUSGeoSurvey extends Parsible[USGeoSurvey] {
     def fromString(w: String): Try[USGeoSurvey] = Try {
@@ -143,63 +143,5 @@ object USGeoSurvey extends App {
     val magnitude = Magnitude(Function.elements(ws, 4, 5, 3))
     val eventtype = ws(15)
     USGeoSurvey(id, datetime, location, magnitude, eventtype)
-  }
-
-  /**
-   * Method to get a sequence of US Geological Survey data that is only of type 'earthquake'
-   *
-   * @param seismicEvents the US Geological Survey data to use
-   * @return a try of sequence of USGeoSurvey data
-   */
-  def getEarthquakes(seismicEvents: Iterator[Try[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
-    val usy = for (ut: Try[USGeoSurvey] <- seismicEvents.toSeq) yield ut.filter(u => u.isEarthquake)
-    Function.sequence(usy.filter(us => us.isSuccess))
-  }
-
-  /**
-   * Method to get a sequence of US Geological Survey data that is only of type 'earthquake' and falls between a
-   * date/time range
-   *
-   * @param earthquakes the US Geological Survey data earthquake list
-   * @param start the start of the date/time range to get
-   * @param end the end of the date/time range to get
-   * @return a try of sequence of USGeoSurvey data
-   */
-  def getDateRange(earthquakes: Try[Seq[USGeoSurvey]], start: DateTime, end: DateTime): Try[Seq[USGeoSurvey]] = {
-    for (qs <- earthquakes)
-      yield qs.filter(q => (q.datetime <= end) && (start <= q.datetime))
-  }
-
-  /**
-   * Method to get a sequence of US Geological Survey data that is only of type 'earthquake' and
-   * is within the area around a location
-   *
-   * @param earthquakes the US Geological Survey data earthquake list
-   * @param location the location from which to search around
-   * @param radius the radius around the location to search within
-   * @return a try of sequence of USGeoSurvey data
-   */
-  def getLocationArea(earthquakes: Try[Seq[USGeoSurvey]], location: Location, radius: Double): Try[Seq[USGeoSurvey]] = {
-    for(qs <- earthquakes)
-      yield qs.filter(q => q.location.distance(location) <= radius)
-  }
-
-  /**
-   * Method to sort the US Geological Survey data by magnitude
-   * @param earthquakes the US Geological Survey data earthquake list
-   * @return USGeoSurvey data sorted by magnitude
-   */
-  def sortByMagnitude(earthquakes: Try[Seq[USGeoSurvey]]): Try[Seq[USGeoSurvey]] = {
-    for(qs <- earthquakes) yield qs.sortBy(_.magnitude.magnitude).reverse
-  }
-
-  /**
-   * Method to find the top earthquake hotspots around the world
-   * @params earthquakes the US Geological Survey data earthquake list
-   * @return a sequence of tuples containing: the place of the hotspot, all it's surrounding activity
-   */
-  def getEarthquakeHotspots(earthquakes: Try[Seq[USGeoSurvey]], numHotspots: Int): Try[Seq[(String, Seq[USGeoSurvey])]] = {
-      for (qs <- earthquakes)
-        yield qs.groupBy(_.location.place).toSeq.sortBy( x => x._2.size)(Ordering[Int].reverse).take(numHotspots)
   }
 }

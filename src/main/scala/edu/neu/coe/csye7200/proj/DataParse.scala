@@ -10,9 +10,12 @@ import scala.util.Try
  * @author Patrick Waddell [001058235]
  * @author Rajendra kumar Rajkumar [001405755]
  */
-class DataParse [T: Parsible] extends (Source => Iterator[Try[T]]) {
-  def apply(source: Source): Iterator[Try[T]] =
-    source.getLines.toSeq.drop(1).map(e => implicitly[Parsible[T]].fromString(e)).iterator
+class DataParse [T: Parsible] extends (Source => Seq[T]) {
+  def apply(source: Source): Seq[T] =
+    source.getLines.toSeq.drop(1).map(e => implicitly[Parsible[T]].fromString(e)) flatMap (_.toOption)
+
+  def apply(line: String): Try[T] =
+    implicitly[Parsible[T]].fromString(line)
 }
 
 trait Parsible[X] {
