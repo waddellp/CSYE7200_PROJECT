@@ -1,0 +1,38 @@
+@()
+
+@main("CSYE7200 Project") {
+@defining(play.core.PlayVersion.current) { version =>
+
+<section id="content">
+  <div class="wrapper doc">
+    <article>
+      <h2>World Earthquake Forecaster</h2>
+      <p>Final Project for the "Big-Data Sys Engr Using Scala" [CSYE 7200] course at Northeastern University</p>
+      <p><strong>Team 3</strong><br>
+        Patrick Waddell <code>NUID: 001058235</code><br>
+        Rajendra kumar Rajkumar <code>NUID: 001405755</code></p>
+      <h3>Overview</h3>
+        <p>Using publicly available data from the U.S. Geological Survey, create a tool to lookup historical data
+        and forecast earthquakes. The tool will include a 10 year historical lookback and provide an interface
+        with Google Maps to provide visualization of the information.</p>
+
+      <h3 id="usecases">Use Cases</h3>
+      <dl>
+        <dt>Historical Lookup</dt>
+          <dd><ul><il>A user enters latitude/longitude/radius and is provided with a Google Map / pins
+            indicating earthquake events.</il></ul></dd>
+        <br><dt>Earthquake Forecast</dt>
+          <dd><ul><il>A user enters an address and is provided with a percentage chance earthquakes
+            at each magnitude.</il></ul></dd>
+        <br><dt>Top 10 Earthquake Hot Spots</dt>
+          <dd><ul><il>A user enters a date range and is provided with the top ten locations
+            around the globe for earthquake activity.</il></ul></dd>
+      </dl>
+    </article>
+    <aside>
+      @commonSidebar()
+    </aside>
+  </div>
+</section>
+}
+}
