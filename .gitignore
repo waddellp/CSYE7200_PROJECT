@@ -7,5 +7,4 @@
 *.iml
 *.idea
 /out/
-/project/
-/target/
+**/target/
