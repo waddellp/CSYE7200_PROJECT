@@ -12,6 +12,8 @@ val log4jVersion = "2.4.1"
 
 enablePlugins(PlayScala)
 
+routesGenerator := InjectedRoutesGenerator
+
 libraryDependencies ++= Seq(
   guice,
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
