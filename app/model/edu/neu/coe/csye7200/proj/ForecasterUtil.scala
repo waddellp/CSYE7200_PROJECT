@@ -1,4 +1,4 @@
-package edu.neu.coe.csye7200.proj
+package model.edu.neu.coe.csye7200.proj
 
 import java.io.{InputStream, SequenceInputStream}
 
@@ -12,6 +12,7 @@ import scala.io.Source
  * Northeastern University
  * CSYE 7200 - Big Data System Engineering Using Scala
  * Project: World Earthquake Forecaster
+ *
  * @author Patrick Waddell [001058235]
  * @author Rajendra kumar Rajkumar [001405755]
  */
@@ -21,6 +22,7 @@ object ForecasterUtil {
   /**
    * Loads all the US Geological Survey information
    * (10 years of data, approx 1 million rows)
+   *
    * @param sc the Spark Context
    * @return a Spark RDD of USGeoSurvey information
    */
@@ -28,19 +30,19 @@ object ForecasterUtil {
     val parser = new DataParse[USGeoSurvey]()
     val files: Seq[InputStream] =
       Vector(
-        Source.getClass.getResourceAsStream("/USGS-2020.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2019.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2018.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2017.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2016.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2015.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2014.csv"),
-        Source.getClass.getResourceAsStream("/USGS-2013.csv"))
-        //Source.getClass.getResourceAsStream("/USGS-2012.csv"),
-        //Source.getClass.getResourceAsStream("/USGS-2011.csv"),
-        //Source.getClass.getResourceAsStream("/USGS-2010.csv"))
+        Source.getClass.getResourceAsStream("/data/USGS-2020.csv"))
+        //Source.getClass.getResourceAsStream("/data/USGS-2019.csv"),
+        //Source.getClass.getResourceAsStream("/data/USGS-2018.csv"),
+        //Source.getClass.getResourceAsStream("/data/USGS-2017.csv"),
+        //Source.getClass.getResourceAsStream("/data/USGS-2016.csv"),
+        //Source.getClass.getResourceAsStream("/data/USGS-2015.csv"),
+        //Source.getClass.getResourceAsStream("/data/USGS-2014.csv"),
+        //Source.getClass.getResourceAsStream("/data/USGS-2013.csv"),
+    //Source.getClass.getResourceAsStream("/USGS-2012.csv"),
+    //Source.getClass.getResourceAsStream("/USGS-2011.csv"),
+    //Source.getClass.getResourceAsStream("/USGS-2010.csv"))
     val filestream = new SequenceInputStream(asJavaEnumeration(files.toIterator))
-    sc.parallelize(Source.fromInputStream(filestream).getLines().toSeq map (u => parser(u))) flatMap(_.toOption)
+    sc.parallelize(Source.fromInputStream(filestream).getLines().toSeq map (u => parser(u)), numSlices=10) flatMap (_.toOption)
   }
 
   /**
@@ -50,7 +52,7 @@ object ForecasterUtil {
    * @return a try of RDD of USGeoSurvey data
    */
   def getEarthquakes(seismicEvents: RDD[USGeoSurvey]): RDD[USGeoSurvey] = {
-    seismicEvents filter( u => u.isEarthquake)
+    seismicEvents filter (u => u.isEarthquake)
   }
 
   /**
@@ -58,12 +60,12 @@ object ForecasterUtil {
    * date/time range
    *
    * @param earthquakes the US Geological Survey data earthquake list
-   * @param start the start of the date/time range to get
-   * @param end the end of the date/time range to get
+   * @param start       the start of the date/time range to get
+   * @param end         the end of the date/time range to get
    * @return a try of sequence of USGeoSurvey data
    */
   def getDateRange(earthquakes: RDD[USGeoSurvey], start: DateTime, end: DateTime): RDD[USGeoSurvey] = {
-    earthquakes filter(u => (u.datetime <= end) && (start <= u.datetime))
+    earthquakes filter (u => (u.datetime <= end) && (start <= u.datetime))
   }
 
   /**
@@ -71,30 +73,32 @@ object ForecasterUtil {
    * is within the area around a location
    *
    * @param earthquakes the US Geological Survey data earthquake list
-   * @param location the location from which to search around
-   * @param radius the radius around the location to search within
+   * @param location    the location from which to search around
+   * @param radius      the radius around the location to search within
    * @return a try of sequence of USGeoSurvey data
    */
   def getLocationArea(earthquakes: RDD[USGeoSurvey], location: Location, radius: Double): RDD[USGeoSurvey] = {
-    earthquakes filter( u=> u.location.distance(location) <= radius)
+    earthquakes filter (u => u.location.distance(location) <= radius)
   }
 
 
   /**
    * Method to sort the US Geological Survey data by magnitude
+   *
    * @param earthquakes the US Geological Survey data earthquake list
    * @return USGeoSurvey data sorted by magnitude
    */
   def sortByMagnitude(earthquakes: RDD[USGeoSurvey]): RDD[USGeoSurvey] = {
-    earthquakes sortBy(- _.magnitude.magnitude)
+    earthquakes sortBy (-_.magnitude.magnitude)
   }
 
   /**
    * Method to find the top earthquake hotspots around the world
+   *
    * @params earthquakes the US Geological Survey data earthquake list
    * @return a sequence of tuples containing: the place of the hotspot, all it's surrounding activity
    */
   def getEarthquakeHotspots(earthquakes: RDD[USGeoSurvey], numHotspots: Int): Seq[(String, Iterable[USGeoSurvey])] = {
-    earthquakes.groupBy(_.location.place).collect().sortBy(- _._2.size).toSeq.take(numHotspots)
+    earthquakes.groupBy(_.location.place).collect().sortBy(-_._2.size).toSeq.take(numHotspots)
   }
 }

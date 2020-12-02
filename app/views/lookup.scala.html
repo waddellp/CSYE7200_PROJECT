@@ -1,8 +1,20 @@
+@import helper._
+@import model.edu.neu.coe.csye7200.proj._
+@(form: Form[LookupForm.Data], postUrl: Call)(implicit request: MessagesRequestHeader)
 @main("Lookup") {
 <section id="content">
-    <div class="wrapper doc">
+    <div class="wrapper">
         <article>
-            <h1>Historical Lookup</h1>
+            <h2>Historical Lookup</h2>
+            <p>
+                @helper.form(postUrl) {
+                @helper.CSRF.formField
+                @helper.inputText(form("latitude"))
+                @helper.inputText(form("longitude"))
+                @helper.inputText(form("radius"))
+                <button>Lookup</button>
+                }
+            </p>
         </article>
         <aside>
             @commonSidebar()

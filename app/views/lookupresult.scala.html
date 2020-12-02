@@ -1,0 +1,25 @@
+@import model.edu.neu.coe.csye7200.proj._
+@(message: String)
+@main("Lookup Results") {
+<section id="content">
+    <div class="wrapper">
+        <article>
+            <h2>Historical Lookup</h2>
+                <table>
+                    <tr>
+                        <td>Date/time</td>
+                        <td>Location</td>
+                        <td>Magnitude</td>
+                    </tr>
+                    <tr>
+                        <td>@message</td>
+                    </tr><br>
+                </table>
+
+        </article>
+        <aside>
+            @commonSidebar()
+        </aside>
+    </div>
+</section>
+}

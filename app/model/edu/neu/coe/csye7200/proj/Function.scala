@@ -1,8 +1,5 @@
-package edu.neu.coe.csye7200.proj
+package model.edu.neu.coe.csye7200.proj
 
-import org.apache.spark.rdd.RDD
-
-import scala.:+
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -11,6 +8,7 @@ import scala.util.{Failure, Success, Try}
  * Northeastern University
  * CSYE 7200 - Big Data System Engineering Using Scala
  * Project: World Earthquake Forecaster
+ *
  * @author Patrick Waddell [001058235]
  * @author Rajendra kumar Rajkumar [001405755]
  */

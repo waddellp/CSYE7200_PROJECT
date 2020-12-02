@@ -1,4 +1,9 @@
-package edu.neu.coe.csye7200.proj
+package model.edu.neu.coe.csye7200.proj
+
+import model.edu.neu.coe.csye7200.proj
+
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
 
 import scala.util.Try
 
@@ -51,6 +56,9 @@ case class Location(latitude: Double, longitude: Double, place: String) {
 }
 
 object Location {
+
+  implicit val writes: Writes[Location] = Json.writes[Location]
+
   def apply(params: List[String]): Location = params match {
     case latitude :: longitude :: description :: Nil =>
       apply(latitude.toDouble, longitude.toDouble, description.substring(description.lastIndexOf("of ") + 3))
@@ -92,6 +100,9 @@ case class DateTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, sec
 }
 
 object DateTime {
+
+  implicit val writes: Writes[DateTime] = Json.writes[DateTime]
+
   // this regex will not parse the UTC (Zulu time) in the dataset
   val rDateTime = """^([1-2]{1}\d{3})-([0-1]{1}\d{1})-([0-3]{1}\d{1})T([0-2]{1}\d{1}):([0-5]{1}\d{1}):([0-5]{1}\d{1})\.\d{3}Z$""".r
 
@@ -111,13 +122,18 @@ case class Magnitude(magnitude: Double, units: String, depth: Double) {
 }
 
 object Magnitude {
+
+  implicit val writes: Writes[Magnitude] = Json.writes[Magnitude]
+
   def apply(params: List[String]): Magnitude = params match {
     case magnitude :: units :: depth :: Nil => apply(magnitude.toDouble, units, depth.toDouble)
     case _ => throw new Exception(s"Parse error in magnitude: $params")
   }
 }
 
-object USGeoSurvey extends App with Serializable {
+object USGeoSurvey extends App {
+
+  implicit val writes: Writes[USGeoSurvey] = Json.writes[USGeoSurvey]
 
   trait ParsibleUSGeoSurvey extends Parsible[USGeoSurvey] {
     def fromString(w: String): Try[USGeoSurvey] = Try {
@@ -136,8 +152,8 @@ object USGeoSurvey extends App with Serializable {
   def apply(ws: Seq[String]): USGeoSurvey = {
     val id = ws(11)
     val datetime = DateTime(ws.head)
-    val location = Location(Function.elements(ws, 1, 2, 13))
-    val magnitude = Magnitude(Function.elements(ws, 4, 5, 3))
+    val location = Location(proj.Function.elements(ws, 1, 2, 13))
+    val magnitude = Magnitude(proj.Function.elements(ws, 4, 5, 3))
     val eventtype = ws(15)
     USGeoSurvey(id, datetime, location, magnitude, eventtype)
   }

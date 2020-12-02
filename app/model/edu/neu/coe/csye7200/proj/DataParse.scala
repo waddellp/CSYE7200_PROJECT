@@ -1,4 +1,4 @@
-package edu.neu.coe.csye7200.proj;
+package model.edu.neu.coe.csye7200.proj
 
 import scala.io.Source
 import scala.util.Try

@@ -1,5 +1,6 @@
 package edu.neu.coe.csye7200.proj
 
+import model.edu.neu.coe.csye7200.proj.{DataParse, DateTime, ForecasterUtil, Location, USGeoSurvey}
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{FlatSpec, Matchers}
 
