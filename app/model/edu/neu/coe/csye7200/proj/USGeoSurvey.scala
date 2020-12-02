@@ -1,9 +1,7 @@
 package model.edu.neu.coe.csye7200.proj
 
 import model.edu.neu.coe.csye7200.proj
-
-import play.api.libs.json.Json
-import play.api.libs.json.Writes
+import play.api.libs.json.{JsObject, JsResult, JsString, JsSuccess, JsValue, Json, Writes}
 
 import scala.util.Try
 
@@ -134,6 +132,43 @@ object Magnitude {
 object USGeoSurvey extends App {
 
   implicit val writes: Writes[USGeoSurvey] = Json.writes[USGeoSurvey]
+
+
+  // convert from Tweet object to JSON (serializing to JSON)
+//  def writes(data: USGeoSurvey): JsValue = {
+//    //  tweetSeq == Seq[(String, play.api.libs.json.JsString)]
+//    val dataSeq = Seq(
+//      "id" -> JsString(data.id),
+//      "datetime" -> JsString(data.datetime.toString),
+//      "latitude" -> JsString(data.location.latitude.toString),
+//      "longitude" -> JsString(data.location.longitude.toString),
+//      "place" -> JsString(data.location.place),
+//      "magnitude" -> JsString(data.magnitude.magnitude.toString),
+//      "units" -> JsString(data.magnitude.units),
+//      "depth" -> JsString(data.magnitude.depth.toString)
+//    )
+//    JsObject(dataSeq)
+//  }
+//
+//  def convertToJsonOrig(dataSeq: Seq[USGeoSurvey]): JsValue = {
+//    Json.toJson(
+//      dataSeq.map { t =>
+//        Map("id" -> t.id,
+//          "datetime" -> t.datetime,
+//          "latitude" -> t.location.latitude,
+//          "longitude" -> t.location.longitude,
+//          "place" -> t.location.place,
+//          "magnitude" -> t.magnitude.magnitude,
+//          "units" -> t.magnitude.units,
+//          "depth" -> t.magnitude.depth)
+//      }
+//    )
+//  }
+  // convert from JSON string to a Tweet object (de-serializing from JSON)
+  // (i don't need this method; just here to satisfy the api)
+  //def reads(json: JsValue): JsResult[USGeoSurvey] = {
+  //  JsSuccess(USGeoSurvey("", "", "", "", "", "", "", ""))
+  //}
 
   trait ParsibleUSGeoSurvey extends Parsible[USGeoSurvey] {
     def fromString(w: String): Try[USGeoSurvey] = Try {

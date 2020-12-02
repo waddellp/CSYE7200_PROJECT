@@ -18,7 +18,7 @@
  article h4{font-size:15px;margin-bottom:3px;}
  article h5{font-size:12px;font-weight:normal;margin-bottom:3px;}
  article .subheader{color:#777;font-weight:300;margin-bottom:24px;}
- article p{line-height:1.3em;margin:1em 0;}
+ article p{ne-height:1.3em;margin:1em 0;}
  article p img{margin:0;}
  article p.lead{font-size:18px;font-size:1.8rem;line-height:1.5;}
  article li>p:first-child{margin-top:0;}
@@ -49,8 +49,8 @@
  article blockquote pre,article .note pre{background:#F5D899 !important;color:#48484C !important;border:none !important;}
  article p.note{padding:15px 20px;}
  article table{width:100%;}article table td{padding:8px;}
- article table tr{background:#8c9dad;border-bottom:1px solid #eee;}
- article table tr:nth-of-type(odd){background:#8c9dad;}
+ article table tr{background:#a6b1bd;border-bottom:1px solid #eee;}
+ article table tr:nth-of-type(odd){background:#bac7d4;}
  article dl dt{font-weight:bold;}
  article dl.tabbed{position:relative;}
  article dl.tabbed dt{float:left;margin:0 5px 0 0;border:1px solid #ddd;padding:0 20px;line-height:2;border-radius: 5px 5px 0 0;}

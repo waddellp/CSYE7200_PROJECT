@@ -7,6 +7,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import play.api.data.Form
 import play.api.i18n._
+import play.api.libs.json.JsValue
 import play.api.mvc._
 
 import scala.collection.convert.ImplicitConversions.`collection asJava`
@@ -35,11 +36,13 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
    * a path of `/message`.
    */
   def message = Action.async {
-    getFutureUSGS(20.second).map { u => Ok(u) }
+    //val result = getFutureUSGS(20.second)
+    //val jsonResult: Future[JsValue] = result. map ((u: Seq[USGeoSurvey]) => convertToJsonOrig(u))
+    getFutureUSGS(20.second).map (u => Ok(views.html.lookupresult(u)))
   }
 
-  private def getFutureUSGS(delayTime: FiniteDuration): Future[String] = {
-    val promise: Promise[String] = Promise[String]()
+  private def getFutureUSGS(delayTime: FiniteDuration): Future[Seq[USGeoSurvey]] = {
+    val promise: Promise[Seq[USGeoSurvey]] = Promise[Seq[USGeoSurvey]]()
     actorSystem.scheduler.scheduleOnce(delayTime) {
       println("START")
       println("Lat: " + userFormData.latitude + " long: " + userFormData.longitude + " radius: " + userFormData.radius)
@@ -50,30 +53,30 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
       val qr = ForecasterUtil.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
       val qrl = ForecasterUtil.getLocationArea(qr, Location(54.662, -159.675, "Alaska Peninsula"), 50.0)
       val qrls = ForecasterUtil.sortByMagnitude(qrl)
-      promise.success(qrls.collect().toSeq.head.toString())
+      promise.success(qrls.collect().toSeq)
       spark.close()
     }(actorSystem.dispatcher) // run scheduled tasks using the actor system's dispatcher
     promise.future
   }
 
-  def lookupPost = Action.async { implicit request: Request[AnyContent] =>
-    val errorFunction = { formWithErrors: Form[Data] =>
-        // binding failure, you retrieve the form containing errors:
-        Future(BadRequest(views.html.lookupresult("Error")))
-      }
-    val successFunction = { formData: Data =>
-        /* binding success, you get the actual value. */
-        println("Received data: " + formData.latitude + ", " + formData.longitude + ", " + formData.radius)
-        userFormData = formData
-        Future(Redirect(routes.LookupController.message()).flashing("info" -> "Lookup complete"))
-    }
-    val formValidationResult = form.bindFromRequest
-    formValidationResult.fold(errorFunction, successFunction)
-  }
+//  def lookupPost = Action.async { implicit request: Request[AnyContent] =>
+//    val errorFunction = { formWithErrors: Form[Data] =>
+//        // binding failure, you retrieve the form containing errors:
+//        Future(BadRequest(views.html.lookupresult("Error")))
+//      }
+//    val successFunction = { formData: Data =>
+//        /* binding success, you get the actual value. */
+//        println("Received data: " + formData.latitude + ", " + formData.longitude + ", " + formData.radius)
+//        userFormData = formData
+//        Future(Redirect(routes.LookupController.message()).flashing("info" -> "Lookup complete"))
+//    }
+//    val formValidationResult = form.bindFromRequest
+//    formValidationResult.fold(errorFunction, successFunction)
+//  }
 
-  def lookupresult = Action {
-    Ok(views.html.lookupresult(""))
-  }
+  //def lookupresult = Action {
+  //  Ok(views.html.lookupresult(""))
+  //}
 /*
 import scala.collection.convert.ImplicitConversions.`collection asJava`
 import scala.collection.mutable
