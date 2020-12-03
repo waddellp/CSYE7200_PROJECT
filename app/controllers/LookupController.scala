@@ -25,7 +25,6 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
   import LookupForm._
   import model.edu.neu.coe.csye7200.proj.USGeoSurvey
 
-  var userFormData: Data = Data(0.0,0.0,0.0)
   private val postUrl = routes.LookupController.lookupPost()
 
   def lookup = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -40,11 +39,12 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
    * will be called when the application receives a `GET` request with
    * a path of `/message`.
    */
-  def lookupPost = Action.async {
-    getFutureUSGS(3.second).map (u => Ok(views.html.lookupresult(u)))
+  def lookupPost = Action.async { implicit request =>
+    val formData: Data = form.bindFromRequest.get
+    getFutureUSGS(formData, 20.second).map (u => Ok(views.html.lookupresult(u)))
   }
 
-  private def getFutureUSGS(delayTime: FiniteDuration): Future[Seq[USGeoSurvey]] = {
+  private def getFutureUSGS(formData: Data, delayTime: FiniteDuration): Future[Seq[USGeoSurvey]] = {
     val promise: Promise[Seq[USGeoSurvey]] = Promise[Seq[USGeoSurvey]]()
     actorSystem.scheduler.scheduleOnce(delayTime) {
       val spark = SparkSession.builder().appName("HistoricalLookup").master("local[*]").getOrCreate()
@@ -52,7 +52,7 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
       val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
       val q = ForecasterUtil.getEarthquakes(data)
       val qr = ForecasterUtil.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
-      val qrl = ForecasterUtil.getLocationArea(qr, Location(54.662, -159.675, "Alaska Peninsula"), 50.0)
+      val qrl = ForecasterUtil.getLocationArea(qr, Location(formData.latitude, formData.longitude, ""), formData.radius)
       val qrls = ForecasterUtil.sortByMagnitude(qrl)
       promise.success(qrls.collect().toSeq)
       spark.close()

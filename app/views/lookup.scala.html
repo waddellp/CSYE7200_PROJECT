@@ -9,9 +9,21 @@
             <p>
                 @helper.form(postUrl) {
                 @helper.CSRF.formField
-                @helper.inputText(form("latitude"))
-                @helper.inputText(form("longitude"))
-                @helper.inputText(form("radius"))
+                @helper.inputText(
+                    form("latitude"),
+                    '_label -> "Latitude",
+                    'placeholder -> "-90 to 90"
+                )
+                @helper.inputText(
+                    form("longitude"),
+                    '_label -> "Longitude",
+                    'placeholder -> "-180 to 180"
+                )
+                @helper.inputText(
+                    form("radius"),
+                    '_label -> "Radius [km]",
+                    'placeholder -> "> 0"
+                )
                 <button>Lookup</button>
                 }
             </p>
