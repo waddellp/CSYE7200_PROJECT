@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.Date
+
 /**
  * Northeastern University
  * CSYE 7200 - Big Data System Engineering Using Scala
@@ -20,7 +22,7 @@ object LookupForm {
    * Using a class specifically for form binding reduces the chances
    * of a parameter tampering attack and makes code clearer.
    */
-  case class Data(latitude: Double, longitude: Double, radius: Double)
+  case class Data(latitude: Double, longitude: Double, radius: Double, startDate: Date, endDate: Date)
 
   /**
    * The form definition for the "create a historical lookup" form.
@@ -31,7 +33,9 @@ object LookupForm {
     mapping(
       "latitude" -> of[Double],
       "longitude" -> of[Double],
-      "radius" -> of[Double]
+      "radius" -> of[Double],
+      "startDate" -> date("yyyy-MM-dd"),
+      "endDate" -> date("yyyy-MM-dd")
     )(Data.apply)(Data.unapply)
   )
 }

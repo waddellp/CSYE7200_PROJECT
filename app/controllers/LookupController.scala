@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.{Calendar, GregorianCalendar}
+
 import akka.actor.ActorSystem
 import javax.inject._
 import model.edu.neu.coe.csye7200.proj.{DateTime, ForecasterUtil, Location}
@@ -47,11 +49,16 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
   private def getFutureUSGS(formData: Data, delayTime: FiniteDuration): Future[Seq[USGeoSurvey]] = {
     val promise: Promise[Seq[USGeoSurvey]] = Promise[Seq[USGeoSurvey]]()
     actorSystem.scheduler.scheduleOnce(delayTime) {
+      val cal = Calendar.getInstance()
+      cal.setTime(formData.startDate)
+      val startDate = DateTime(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0 )
+      cal.setTime(formData.endDate)
+      val endDate = DateTime(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH), 23, 59, 59 )
       val spark = SparkSession.builder().appName("HistoricalLookup").master("local[*]").getOrCreate()
       val sc = spark.sparkContext
       val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
       val q = ForecasterUtil.getEarthquakes(data)
-      val qr = ForecasterUtil.getDateRange(q, DateTime("2020-10-01T00:00:00.000Z"), DateTime("2020-10-31T23:59:59.000Z"))
+      val qr = ForecasterUtil.getDateRange(q, startDate, endDate)
       val qrl = ForecasterUtil.getLocationArea(qr, Location(formData.latitude, formData.longitude, ""), formData.radius)
       val qrls = ForecasterUtil.sortByMagnitude(qrl)
       promise.success(qrls.collect().toSeq)
