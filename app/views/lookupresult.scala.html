@@ -1,10 +1,20 @@
 @import model.edu.neu.coe.csye7200.proj._
-@(message: Seq[USGeoSurvey])
+@(data: Seq[USGeoSurvey])
 @main("Lookup Results") {
 <section id="content">
     <div class="wrapper">
         <article>
             <h2>Historical Lookup</h2>
+            <div>
+                <iframe
+                    width="500"
+                    height="500"
+                    frameborder="0" style="border:0"
+                    src="https://www.google.com/maps/embed/v1/view?key=AIzaSyAE2UpXjKKqvI86_mQ37Yak8xH8YisubWg&center=@data.head.location.latitude,@data.head.location.longitude&zoom=10&maptype=satellite"
+                    allowfullscreen>
+                </iframe>
+            </div>
+
             <div>
                 <table>
                     <tr><td style="text-align: center"><b><u>Date/time</u></b></td>
@@ -12,7 +22,7 @@
                         <td style="text-align: center"><b><u>Latitude</u></b></td>
                         <td style="text-align: center"><b><u>Longitude</u></b></td>
                         <td style="text-align: center"><b><u>Magnitude</u></b></td></tr>
-                @for( u <- message ) {
+                @for( u <- data ) {
                 <tr>
                     <td>@u.datetime.toString()</td>
                     <td>@u.location.place</td>

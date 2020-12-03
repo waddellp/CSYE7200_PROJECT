@@ -16,7 +16,6 @@ import scala.io.Source
  * @author Patrick Waddell [001058235]
  * @author Rajendra kumar Rajkumar [001405755]
  */
-
 object ForecasterUtil {
 
   /**
@@ -30,14 +29,14 @@ object ForecasterUtil {
     val parser = new DataParse[USGeoSurvey]()
     val files: Seq[InputStream] =
       Vector(
-        Source.getClass.getResourceAsStream("/data/USGS-2020.csv"))
-        //Source.getClass.getResourceAsStream("/data/USGS-2019.csv"),
-        //Source.getClass.getResourceAsStream("/data/USGS-2018.csv"),
-        //Source.getClass.getResourceAsStream("/data/USGS-2017.csv"),
-        //Source.getClass.getResourceAsStream("/data/USGS-2016.csv"),
-        //Source.getClass.getResourceAsStream("/data/USGS-2015.csv"),
-        //Source.getClass.getResourceAsStream("/data/USGS-2014.csv"),
-        //Source.getClass.getResourceAsStream("/data/USGS-2013.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2020.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2019.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2018.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2017.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2016.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2015.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2014.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2013.csv"))
     //Source.getClass.getResourceAsStream("/USGS-2012.csv"),
     //Source.getClass.getResourceAsStream("/USGS-2011.csv"),
     //Source.getClass.getResourceAsStream("/USGS-2010.csv"))

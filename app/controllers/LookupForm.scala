@@ -1,5 +1,14 @@
 package controllers
 
+/**
+ * Northeastern University
+ * CSYE 7200 - Big Data System Engineering Using Scala
+ * Project: World Earthquake Forecaster
+ *
+ * @author Patrick Waddell [001058235]
+ * @author Rajendra kumar Rajkumar [001405755]
+ */
+
 object LookupForm {
   import play.api.data.Forms._
   import play.api.data.Form
