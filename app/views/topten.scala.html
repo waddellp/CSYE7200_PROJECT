@@ -1,9 +1,41 @@
-@()
+@import helper._
+@(form: Form[TopTenForm.TopTenData], postUrl: Call)(implicit request: MessagesRequestHeader)
 @main("TopTen") {
 <section id="content">
     <div class="wrapper">
         <article>
             <h2>Top Ten</h2>
+            <p>Provides a top ten results for earthquake activity around the globe within a date range.</p>
+            <p>
+                @helper.form(postUrl) {
+            <p style="font-size: 16px">
+                <!--<p style="font-size: 16px">-->
+                @helper.CSRF.formField
+                <style>
+                    .column {float: left;width: 33%;}
+                    .row:after {content: "";display: table;clear: both;}
+                </style>
+            <div class="row">
+                <div class="column">
+                    @helper.inputDate(
+                    form("startDate"),
+                    '_label -> "Start Date",
+                    'placeholder -> "",
+                    'class->"form-control")
+                </div>
+                <div class="column">
+                    @helper.inputDate(
+                    form("endDate"),
+                    '_label -> "End Date",
+                    'placeholder -> "",
+                    'class->"form-control")
+                </div>
+            </div>
+            </p>
+            <br>
+            <button style="font-size : 18px">Lookup</button>
+            }
+            </p>
         </article>
         <aside>
             @commonSidebar()

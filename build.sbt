@@ -4,8 +4,6 @@ version := "0.1"
 
 scalaVersion := "2.12.12"
 
-val akkaGroup = "com.typesafe.akka"
-val akkaVersion = "2.5.17"
 val scalaTestVersion = "3.1.0"
 val sparkVersion = "3.0.1"
 val log4jVersion = "2.4.1"

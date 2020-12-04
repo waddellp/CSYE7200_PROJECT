@@ -2,9 +2,8 @@ package controllers
 
 import java.util.Date
 
-import play.api.data.Forms._
 import play.api.data.Form
-import play.api.data.format.Formats._
+import play.api.data.Forms._
 
 /**
  * Northeastern University
@@ -15,7 +14,7 @@ import play.api.data.format.Formats._
  * @author Rajendra kumar Rajkumar [001405755]
  */
 
-object LookupForm {
+object TopTenForm {
 
   /**
    * A form processing DTO that maps to the form below.
@@ -23,20 +22,17 @@ object LookupForm {
    * Using a class specifically for form binding reduces the chances
    * of a parameter tampering attack and makes code clearer.
    */
-  case class LookupData(latitude: Double, longitude: Double, radius: Double, startDate: Date, endDate: Date)
+  case class TopTenData(startDate: Date, endDate: Date)
 
   /**
-   * The form definition for the "create a historical lookup" form.
+   * The form definition for the "create a top ten lookup" form.
    * It specifies the form fields and their types,
    * as well as how to convert from a Data to form data and vice versa.
    */
   val form = Form(
     mapping(
-      "latitude" -> of[Double],
-      "longitude" -> of[Double],
-      "radius" -> of[Double],
       "startDate" -> date("yyyy-MM-dd"),
       "endDate" -> date("yyyy-MM-dd")
-    )(LookupData.apply)(LookupData.unapply)
+    )(TopTenData.apply)(TopTenData.unapply)
   )
 }

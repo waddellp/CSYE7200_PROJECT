@@ -1,0 +1,33 @@
+@import model.edu.neu.coe.csye7200.proj._
+@(data: Seq[(String, Seq[USGeoSurvey])])
+@main("Top Ten Results") {
+<section id="content">
+    <div class="wrapper">
+        <article>
+            <h2>Top Ten</h2>
+            <div>
+                <table>
+                    <tr>
+                        <td><b><u>#</u></b></td>
+                        <td><b><u>Place</u></b></td>
+                        <td><b><u>Coordinate</u></b></td>
+                        <td><b><u>Number of earthquakes</u></b></td>
+                    </tr>
+                    @for(i <- 1 to 10) {
+                        <tr>
+                            <td>@i</td>
+                            <td>@data(i-1)._1</td>
+                            <td>[lat: @{"%.2f".format(data(i-1)._2.head.location.latitude)}, long: @{"%.2f".format(data(i-1)._2.head.location.longitude)}]</td>
+                            <td>@data(i-1)._2.size</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </article>
+        <aside>
+            @commonSidebar()
+        </aside>
+    </div>
+</section>
+
+}

@@ -4,12 +4,12 @@ import java.util.Calendar
 
 import akka.actor.ActorSystem
 import javax.inject._
-import model.edu.neu.coe.csye7200.proj.{DateTime, ForecasterUtil, Location}
+import model.edu.neu.coe.csye7200.proj.{DateTime, ForecasterUtil}
 import org.apache.spark.FutureAction
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import play.api.mvc._
-import LookupForm._
+import TopTenForm._
 import model.edu.neu.coe.csye7200.proj.USGeoSurvey
 import scala.concurrent.ExecutionContext
 
@@ -23,14 +23,14 @@ import scala.concurrent.ExecutionContext
  */
 
 @Singleton
-class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends MessagesAbstractController(cc) {
+class TopTenController @Inject()(cc: MessagesControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends MessagesAbstractController(cc) {
 
-  private val postUrl = routes.LookupController.lookupPost()
-  private val spark = SparkSession.builder().appName("HistoricalLookup").master("local[*]").getOrCreate()
+  private val postUrl = routes.TopTenController.toptenPost()
+  private val spark = SparkSession.builder().appName("TopTenLookup").master("local[*]").getOrCreate()
   private val sc = spark.sparkContext
 
-  def lookup = Action { implicit request: MessagesRequest[AnyContent] =>
-    Ok(views.html.lookup(form, postUrl))
+  def topten = Action { implicit request: MessagesRequest[AnyContent] =>
+    Ok(views.html.topten(form, postUrl))
   }
 
   /**
@@ -41,13 +41,14 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
    * will be called when the application receives a `GET` request with
    * a path of `/message`.
    */
-  def lookupPost = Action.async { implicit request =>
-    val formData: LookupData = form.bindFromRequest.get
+  def toptenPost = Action.async { implicit request =>
+    val formData: TopTenData = form.bindFromRequest.get
     val result = getFutureUSGS(formData)
-    result map (res => Ok(views.html.lookupresult(res)))
+    result map ((res: Seq[(String, Seq[USGeoSurvey])]) => {
+      Ok(views.html.toptenresult(res.sortBy(-_._2.size).take(10)))})
   }
 
-  private def getFutureUSGS(formData: LookupData): FutureAction[Seq[USGeoSurvey]] = {
+  private def getFutureUSGS(formData: TopTenData): FutureAction[Seq[(String, Seq[USGeoSurvey])]] = {
     val cal = Calendar.getInstance()
     cal.setTime(formData.startDate)
     val startDate = DateTime(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0 )
@@ -56,8 +57,6 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val q = ForecasterUtil.getEarthquakes(data)
     val qr = ForecasterUtil.getDateRange(q, startDate, endDate)
-    val qrl = ForecasterUtil.getLocationArea(qr, Location(formData.latitude, formData.longitude, ""), formData.radius)
-    val qrls = ForecasterUtil.sortByMagnitude(qrl)
-    qrls.collectAsync()
+    qr.groupBy(_.location.place).map(y => y._1 -> y._2.toSeq ).collectAsync()
   }
 }
