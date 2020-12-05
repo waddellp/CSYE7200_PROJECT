@@ -48,7 +48,7 @@ class TopTenController @Inject()(cc: MessagesControllerComponents, actorSystem: 
           } else {
             val result = getFutureUSGS(formData)
             result map (res => {
-              if (res.nonEmpty) {
+              if (res.nonEmpty && res.size >= 10) {
                 Ok(views.html.toptenresult(res.sortBy(-_._2.size).take(10)))
               } else {
                 BadRequest
