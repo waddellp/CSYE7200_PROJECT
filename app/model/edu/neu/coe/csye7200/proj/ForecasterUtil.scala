@@ -36,10 +36,10 @@ object ForecasterUtil {
         Source.getClass.getResourceAsStream("/data/USGS-2016.csv"),
         Source.getClass.getResourceAsStream("/data/USGS-2015.csv"),
         Source.getClass.getResourceAsStream("/data/USGS-2014.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2013.csv"))
-    //Source.getClass.getResourceAsStream("/USGS-2012.csv"),
-    //Source.getClass.getResourceAsStream("/USGS-2011.csv"),
-    //Source.getClass.getResourceAsStream("/USGS-2010.csv"))
+        Source.getClass.getResourceAsStream("/data/USGS-2013.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2012.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2011.csv"),
+        Source.getClass.getResourceAsStream("/data/USGS-2010.csv"))
     val filestream = new SequenceInputStream(asJavaEnumeration(files.toIterator))
     sc.parallelize(Source.fromInputStream(filestream).getLines().toSeq map (u => parser(u)), numSlices=10) flatMap (_.toOption)
   }

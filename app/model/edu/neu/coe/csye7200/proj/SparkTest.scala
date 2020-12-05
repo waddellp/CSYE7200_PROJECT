@@ -5,6 +5,17 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
+/**
+ * Northeastern University
+ * CSYE 7200 - Big Data System Engineering Using Scala
+ * Project: World Earthquake Forecaster
+ * @author Patrick Waddell [001058235]
+ * @author Rajendra kumar Rajkumar [001405755]
+ */
+
+/**
+ * This object is a test of the ForecasterUtil class with Spark and RDDs
+ */
 object SparkTest extends App {
 
   val log = Logger.getLogger(getClass.getName)
