@@ -4,26 +4,90 @@
 <section id="top">
     <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyAE2UpXjKKqvI86_mQ37Yak8xH8YisubWg"
             type="text/javascript"></script>
-    <style type="text/css">
-      html, body, #map { height: 500px; width: 100%; margin: 0; }
-    </style>
     <script type="text/javascript">
     function initialize() {
-      var map = new google.maps.Map(
+        var map = new google.maps.Map(
         document.getElementById('map'), {
           center: new google.maps.LatLng(@data(0)._2.head.location.latitude,@data(0)._2.head.location.longitude),
-          zoom: 3,
+          zoom: 2,
           mapTypeId: google.maps.MapTypeId.TERRAIN
-      });
+        });
 
-      var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(@data(0)._2.head.location.latitude,@data(0)._2.head.location.longitude),
-            map: map
-      });
-
+        var m1 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(0)._2.head.location.latitude, @data(0)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(0)._2.head.location.place, @data(0)._2.size earthquakes'
+        });
+        var m2 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(1)._2.head.location.latitude, @data(1)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(1)._2.head.location.place, @data(1)._2.size earthquakes'
+        });
+        var m3 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(2)._2.head.location.latitude, @data(2)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(2)._2.head.location.place, @data(2)._2.size earthquakes'
+        });
+        var m4 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(3)._2.head.location.latitude, @data(3)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(3)._2.head.location.place, @data(3)._2.size earthquakes'
+        });
+        var m5 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(4)._2.head.location.latitude, @data(4)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(4)._2.head.location.place, @data(4)._2.size earthquakes'
+        });
+        var m6 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(5)._2.head.location.latitude, @data(5)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(5)._2.head.location.place, @data(5)._2.size earthquakes'
+        });
+        var m7 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(6)._2.head.location.latitude, @data(6)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(6)._2.head.location.place, @data(6)._2.size earthquakes'
+        });
+        var m8 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(7)._2.head.location.latitude, @data(7)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(7)._2.head.location.place, @data(7)._2.size earthquakes'
+        });
+        var m9 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(8)._2.head.location.latitude, @data(8)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(8)._2.head.location.place, @data(8)._2.size earthquakes'
+        });
+        var m10 = new google.maps.Marker({
+            position: new google.maps.LatLng(@data(9)._2.head.location.latitude, @data(9)._2.head.location.longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data(9)._2.head.location.place, @data(9)._2.size earthquakes'
+        });
     }
     google.maps.event.addDomListener(window, 'load', initialize);
     </script>
+    <style type="text/css"> html, body, #map { height: 500px; width: 100%; margin: 0; }</style>
+
     <div id="map"</div>
 </section>
 <section id="content">

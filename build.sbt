@@ -12,6 +12,8 @@ enablePlugins(PlayScala)
 
 routesGenerator := InjectedRoutesGenerator
 
+cancelable in Global := true
+
 libraryDependencies ++= Seq(
   guice,
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test",

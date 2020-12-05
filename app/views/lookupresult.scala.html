@@ -15,12 +15,13 @@
           zoom: 6,
           mapTypeId: google.maps.MapTypeId.TERRAIN
       });
-
       var marker = new google.maps.Marker({
             position: new google.maps.LatLng(@data.head.location.latitude,@data.head.location.longitude),
-            map: map
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: '@data.head.location.place, @data.size earthquakes'
       });
-
     }
     google.maps.event.addDomListener(window, 'load', initialize);
     </script>
