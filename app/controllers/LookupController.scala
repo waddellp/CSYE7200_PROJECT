@@ -11,7 +11,8 @@ import org.apache.spark.sql.SparkSession
 import play.api.mvc._
 import LookupForm._
 import model.edu.neu.coe.csye7200.proj.USGeoSurvey
-import scala.concurrent.ExecutionContext
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Northeastern University
@@ -34,17 +35,27 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
   }
 
   /**
-   * Creates an Action that returns a plain text message after a delay
-   * of 1 second.
-   *
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/message`.
+   * Creates an Action that returns a Sequence of US Geological Survey data
    */
   def lookupPost = Action.async { implicit request =>
-    val formData: LookupData = form.bindFromRequest.get
-    val result = getFutureUSGS(formData)
-    result map (res => Ok(views.html.lookupresult(res)))
+    form.bindFromRequest.fold(
+      errors => Future.successful(BadRequest(views.html.lookup(errors, postUrl))),
+      {
+        formData =>
+          val valForm = validateForm(form.fill(formData))
+          if (valForm.hasErrors) {
+            Future.successful(Ok(views.html.lookup(valForm, postUrl)))
+          } else {
+            val result = getFutureUSGS(formData)
+            result map (res => {
+              if (res.nonEmpty) {
+                Ok(views.html.lookupresult(res))
+              } else {
+                BadRequest
+              }
+            })
+          }
+      })
   }
 
   private def getFutureUSGS(formData: LookupData): FutureAction[Seq[USGeoSurvey]] = {

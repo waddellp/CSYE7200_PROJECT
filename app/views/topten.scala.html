@@ -21,14 +21,18 @@
                     form("startDate"),
                     '_label -> "Start Date",
                     'placeholder -> "",
-                    'class->"form-control")
+                    'class->"form-control",
+                    '_help -> "MM/DD/YYYY",
+                    '_showErrors -> true)
                 </div>
                 <div class="column">
                     @helper.inputDate(
                     form("endDate"),
                     '_label -> "End Date",
                     'placeholder -> "",
-                    'class->"form-control")
+                    'class->"form-control",
+                    '_help -> "MM/DD/YYYY",
+                    '_showErrors -> true)
                 </div>
             </div>
             </p>

@@ -21,21 +21,27 @@
                         form("latitude"),
                         '_label -> "Latitude",
                         'placeholder -> "-90 to 90",
-                        'class->"form-control")
+                        'class->"form-control",
+                        '_help -> "degrees",
+                        '_showErrors -> true)
                     </div>
                     <div class="column">
                         @helper.inputText(
                         form("longitude"),
                         '_label -> "Longitude",
                         'placeholder -> "-180 to 180",
-                        'class->"form-control")
+                        'class->"form-control",
+                        '_help -> "degrees",
+                        '_showErrors -> true)
                     </div>
                     <div class="column">
                         @helper.inputText(
                         form("radius"),
                         '_label -> "Radius [km]",
                         'placeholder -> "> 0",
-                        'class->"form-control")
+                        'class->"form-control",
+                        '_help -> "kilometers",
+                        '_showErrors -> true)
                     </div>
                 </div>
                 <div class="row">
@@ -44,14 +50,18 @@
                         form("startDate"),
                         '_label -> "Start Date",
                         'placeholder -> "",
-                        'class->"form-control")
+                        'class->"form-control",
+                        '_help -> "MM/DD/YYYY",
+                        '_showErrors -> true)
                     </div>
                     <div class="column">
                         @helper.inputDate(
                         form("endDate"),
                         '_label -> "End Date",
                         'placeholder -> "",
-                        'class->"form-control")
+                        'class->"form-control",
+                        '_help -> "MM/DD/YYYY",
+                        '_showErrors -> true)
                     </div>
                 </div>
                 </p>

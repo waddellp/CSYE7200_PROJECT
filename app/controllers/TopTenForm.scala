@@ -2,6 +2,7 @@ package controllers
 
 import java.util.Date
 
+import controllers.LookupForm.LookupData
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -35,4 +36,13 @@ object TopTenForm {
       "endDate" -> date("yyyy-MM-dd")
     )(TopTenData.apply)(TopTenData.unapply)
   )
+
+  def validateForm(form: Form[TopTenData]) = {
+    val data: TopTenData = form.value.get
+    if (data.startDate.after(data.endDate)) {
+      form.withError("startDate", "start/end date error")
+    } else {
+      form
+    }
+  }
 }

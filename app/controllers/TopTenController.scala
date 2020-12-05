@@ -11,7 +11,8 @@ import org.apache.spark.sql.SparkSession
 import play.api.mvc._
 import TopTenForm._
 import model.edu.neu.coe.csye7200.proj.USGeoSurvey
-import scala.concurrent.ExecutionContext
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Northeastern University
@@ -34,18 +35,27 @@ class TopTenController @Inject()(cc: MessagesControllerComponents, actorSystem: 
   }
 
   /**
-   * Creates an Action that returns a plain text message after a delay
-   * of 1 second.
-   *
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/message`.
+   * Creates an Action that returns top ten US Geological Survey data
    */
   def toptenPost = Action.async { implicit request =>
-    val formData: TopTenData = form.bindFromRequest.get
-    val result = getFutureUSGS(formData)
-    result map ((res: Seq[(String, Seq[USGeoSurvey])]) => {
-      Ok(views.html.toptenresult(res.sortBy(-_._2.size).take(10)))})
+    form.bindFromRequest.fold(
+      errors => Future.successful(BadRequest(views.html.topten(errors, postUrl))),
+      {
+        formData =>
+          val valForm = validateForm(form.fill(formData))
+          if (valForm.hasErrors) {
+            Future.successful(Ok(views.html.topten(valForm, postUrl)))
+          } else {
+            val result = getFutureUSGS(formData)
+            result map (res => {
+              if (res.nonEmpty) {
+                Ok(views.html.toptenresult(res.sortBy(-_._2.size).take(10)))
+              } else {
+                BadRequest
+              }
+            })
+          }
+      })
   }
 
   private def getFutureUSGS(formData: TopTenData): FutureAction[Seq[(String, Seq[USGeoSurvey])]] = {
