@@ -63,7 +63,7 @@ class ForecastController @Inject()(cc: MessagesControllerComponents, actorSystem
     val ql = ForecasterUtil.getLocationArea(q, Location(latitude, longitude, ""), radius)
     val qlm = ForecasterUtil.filterByMagnitude(ql,magnitude)
     val fEarthquakecount = qlm.count()
-    val earthquakeFrequency = fEarthquakecount/years
+    val earthquakeFrequency = fEarthquakecount/years.toDouble
     val probOfAtleast1Earthquake = 1 - scala.math.exp(-(earthquakeFrequency * years))
     probOfAtleast1Earthquake
   }
