@@ -27,21 +27,4 @@ object Function {
     for (i <- indices) x += list(i)
     x.toList
   }
-
-  /**
-   * Method to convert a Sequence of Try of X to a Try of Sequence of X
-   *
-   * @param xys the sequence of try of X
-   * @tparam X the class to convert
-   * @return a try of sequnce of X
-   */
-  def sequence[X](xys: Seq[Try[X]]): Try[Seq[X]] = (Try(Seq[X]()) /: xys) {
-    (xsy, xy) => for (xs: Seq[X] <- xsy; x <- xy) yield xs :+ x
-  }
-
-  def flatten[X](xfy: Try[Future[X]]): Future[X] =
-    xfy match {
-      case Success(xf) => xf
-      case Failure(e) => Future.failed(e)
-    }
 }
