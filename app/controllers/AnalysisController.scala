@@ -49,12 +49,12 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
             Future.successful(
               Ok(views.html.analysisresult(
                 formData.latitude, formData.longitude,
-                linearAnalysis(formData.latitude, formData.longitude))))
+                linearRegAnalysis(formData.latitude, formData.longitude))))
           }
       })
   }
 
-  def linearAnalysis(latitude: Double, longitude: Double) = {
+  def linearRegAnalysis(latitude: Double, longitude: Double): Double= {
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val df = spark.createDataFrame(data).toDF()
     val flattenedDF = df.select(col("id"),

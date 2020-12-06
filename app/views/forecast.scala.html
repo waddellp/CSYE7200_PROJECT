@@ -1,11 +1,11 @@
 @import helper._
-@(form: Form[AnalysisForm.AnalysisData], postUrl: Call)(implicit request: MessagesRequestHeader)
-@main("Magnitude Linear Regression Analysis") {
+@(form: Form[ForecastForm.ForecastData], postUrl: Call)(implicit request: MessagesRequestHeader)
+@main("Forecast Probability Analysis") {
 <section id="content">
     <div class="wrapper">
         <article>
-            <h2>Magnitude Linear Regression Analysis</h2>
-            <p>Estimate the magnitude of a earthquake at a user specified latitude and longitude</p>
+            <h2>Forecast Probability Analysis</h2>
+            <p>Estimate the probability of an earthquake occurring at a user location</p>
             <p>
                 @helper.form(postUrl) {
                 <p style="font-size: 16px">
@@ -31,6 +31,35 @@
                         'placeholder -> "-180 to 180",
                         'class->"form-control",
                         '_help -> "degrees",
+                        '_showErrors -> true)
+                    </div>
+                    <div class="column">
+                        @helper.inputText(
+                        form("radius"),
+                        '_label -> "Radius [km]",
+                        'placeholder -> "> 0.0",
+                        'class->"form-control",
+                        '_help -> "kilometers",
+                        '_showErrors -> true)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        @helper.inputText(
+                        form("magnitude"),
+                        '_label -> "Magnitude",
+                        'placeholder -> ">= 2.5",
+                        'class->"form-control",
+                        '_help -> "",
+                        '_showErrors -> true)
+                    </div>
+                    <div class="column">
+                        @helper.inputText(
+                        form("years"),
+                        '_label -> "Years",
+                        'placeholder -> ">0",
+                        'class->"form-control",
+                        '_help -> "",
                         '_showErrors -> true)
                     </div>
                 </div>

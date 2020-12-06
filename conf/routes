@@ -10,6 +10,8 @@ GET     /topten                             controllers.TopTenController.topten
 POST    /toptenPost                         controllers.TopTenController.toptenPost
 GET     /analysis                           controllers.AnalysisController.analysis
 POST    /analysisPost                       controllers.AnalysisController.analysisPost
+GET     /forecast                           controllers.ForecastController.forecast
+POST    /forecastPost                       controllers.ForecastController.forecastPost
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

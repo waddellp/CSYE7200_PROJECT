@@ -41,6 +41,8 @@ object TopTenForm {
     val data: TopTenData = form.value.get
     if (data.startDate.after(data.endDate)) {
       form.withError("startDate", "start/end date error")
+    } else if (data.startDate.before(new Date(2010,1,1))) {
+      form.withError("startDate", "start date must be after 1/1/2010")
     } else {
       form
     }

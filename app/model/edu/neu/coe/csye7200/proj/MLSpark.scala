@@ -91,7 +91,7 @@ object MLSpark extends App{
 
     //Use case 1: Getting latitude, longitude details from User and displaying
     //the probable magnitude of an earthquake occurrence
-    //TODO : User Input - To be received from UI. Hardcoded for now
+    //To be received from UI. Hardcoded for now
     val userInputData = Seq(Row(67.5132, -160.9215)) //Latitude and Longitude
 
     val userInputSchema = List(
@@ -116,8 +116,6 @@ object MLSpark extends App{
 
     //Use case 2: Getting latitude, longitude, magnitude, radius  and Number of years from user and displaying the
     //the probability of at least one earthquake occurrence at the given location above the user given magnitude
-    //TODO - Code cleanup
-
     val noOfYears = 5.0 // Number of years for which probability needs to be calculated. Hardcoded for now. Need to get user input.
     val radius = 5.0 // Radius within user given location, where earthquake occurrences are picked up.Hardcoded for now. Need to get user input.
     val magnitude = 3.0 //Magnitude of earthquake is hardcoded for now. Need to get user input.
@@ -128,9 +126,6 @@ object MLSpark extends App{
     val fEarthquakecount = qlm.count()
     val earthquakeFrequency = fEarthquakecount/noOfYears
     val probOfAtleast1Earthquake = 1 - scala.math.exp(-(earthquakeFrequency * noOfYears))
-
-    /*@Patrick. Five Inputs needed from user are 1)latitude, 2)longitude, 3)magnitude, 4)radius and 5)number of years
-    Output value to be displayed is  probOfAtleast1Earthquake */
 
     println("The probability of having atleast one earthquake greater than magnitude of "+magnitude +" at user given location " +
       "in next "+noOfYears+" is: "+probOfAtleast1Earthquake)
