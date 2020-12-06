@@ -20,8 +20,6 @@ import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructT
  */
 
 object MLSpark extends App{
-  override def main(args: Array[String]): Unit = {
-
     val log = Logger.getLogger(getClass.getName)
     log.setLevel(Level.ERROR)
 
@@ -52,7 +50,6 @@ object MLSpark extends App{
       setOutputCol("features").setHandleInvalid("skip")
 
     val output = assembler1.transform(renamedDF)
-
 
     val trainingTest = output.randomSplit(Array(0.7,0.3))
     val trainingDF = trainingTest(0)
@@ -92,7 +89,6 @@ object MLSpark extends App{
     println("***Printing only features***")
     lrModel.transform(testDF).select("features").show()
 
-
     //Use case 1: Getting latitude, longitude details from User and displaying
     //the probable magnitude of an earthquake occurrence
     //TODO : User Input - To be received from UI. Hardcoded for now
@@ -106,7 +102,6 @@ object MLSpark extends App{
     val userInputDF = spark.createDataFrame(spark.sparkContext.parallelize(userInputData),
       StructType(userInputSchema))
 
-
     val output1 = assembler1.transform(userInputDF)
     val userInputTrainingSet = output1.randomSplit(Array(1,0))
     val userInputDataSet1 = userInputTrainingSet(0)
@@ -119,14 +114,9 @@ object MLSpark extends App{
     userInputPredictionAndLabel.collect().foreach(u => println("Predictions for User Input:\n Latitude: "+u._1
       +"\n Longitude:"+u._2+"\nPredicted Magnitude:"+u._3))
 
-
     //Use case 2: Getting latitude, longitude, magnitude details and displaying the
     //the probability of at least one earthquake occurrence above the user given magnitude
     //TODO
 
     spark.stop()
-
-
-
-  }
 }
