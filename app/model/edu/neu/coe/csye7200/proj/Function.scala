@@ -27,4 +27,17 @@ object Function {
     for (i <- indices) x += list(i)
     x.toList
   }
+
+  /**
+   * Method to return an Option of Double when passed a String
+   * @param s the String to convert to Double
+   * @return an Option of Double
+   */
+  def toDouble(s: String):Option[Double] = {
+    try {
+      Some(s.toDouble)
+    } catch {
+      case _: NumberFormatException => None
+    }
+  }
 }

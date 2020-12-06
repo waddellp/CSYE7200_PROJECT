@@ -135,10 +135,10 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
   /**
    * Test successful parsing of the Magnitude data (magnitude, units, depth)
    */
-  it should "work for magnitude/unit/depth" in {
-    val x = Magnitude(List("1.66", "ml", "16.67"))
+  it should "work for magnitude/unit/depth/magError/depthError" in {
+    val x = Magnitude(List("1.66", "ml", "16.67", "0.1", "0.4"))
     x should matchPattern {
-      case Magnitude(1.66, "ml", 16.67) =>
+      case Magnitude(1.66, "ml", 16.67, 0.1, 0.4) =>
     }
   }
   /**
@@ -146,12 +146,24 @@ class USGeoSurveySpec extends FlatSpec with Matchers {
    */
   it should "not work for invalid magnitude" in {
     assertThrows[Exception] { // Expect Exception
-      Magnitude(List("bad_magnitude", "ml", "16.67"))
+      Magnitude(List("bad_magnitude", "ml", "16.67", "0.1", "0.4"))
     }
   }
   it should "not work for invalid depth [km]" in {
     assertThrows[Exception] { // Expect Exception
-      Magnitude(List("1.66", "ml", "bad_depth"))
+      Magnitude(List("1.66", "ml", "bad_depth", "0.1", "0.4"))
+    }
+  }
+  it should "work for no magnitude error" in {
+    val x = Magnitude(List("1.66", "ml", "16.67", "", "0.4"))
+    x should matchPattern {
+      case Magnitude(1.66, "ml", 16.67, 0.0, 0.4) =>
+    }
+  }
+  it should "work for no depth error" in {
+    val x = Magnitude(List("1.66", "ml", "16.67", "0.1", ""))
+    x should matchPattern {
+      case Magnitude(1.66, "ml", 16.67, 0.1, 0.0) =>
     }
   }
 }

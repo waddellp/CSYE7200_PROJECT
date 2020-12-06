@@ -115,8 +115,8 @@ object DateTime {
  * @param magnitude the magnitude of the seismic event
  * @param units the unit of measurement for the magnitude
  */
-case class Magnitude(magnitude: Double, units: String, depth: Double) {
-  override def toString: String = { s"$magnitude[$units],$depth[km]" }
+case class Magnitude(magnitude: Double, units: String, depth: Double, magError: Double, depthError: Double) {
+  override def toString: String = { s"$magnitude[$units],$depth[km],$magError,$depthError" }
 }
 
 object Magnitude {
@@ -124,7 +124,8 @@ object Magnitude {
   implicit val writes: Writes[Magnitude] = Json.writes[Magnitude]
 
   def apply(params: List[String]): Magnitude = params match {
-    case magnitude :: units :: depth :: Nil => apply(magnitude.toDouble, units, depth.toDouble)
+    case magnitude :: units :: depth :: magError :: depthError :: Nil =>
+      apply(magnitude.toDouble, units, depth.toDouble, Function.toDouble(magError).getOrElse(0.0), Function.toDouble(depthError).getOrElse(0.0))
     case _ => throw new Exception(s"Parse error in magnitude: $params")
   }
 }
@@ -151,7 +152,7 @@ object USGeoSurvey extends App {
     val id = ws(11)
     val datetime = DateTime(ws.head)
     val location = Location(proj.Function.elements(ws, 1, 2, 13))
-    val magnitude = Magnitude(proj.Function.elements(ws, 4, 5, 3))
+    val magnitude = Magnitude(proj.Function.elements(ws, 4, 5, 3, 17, 16))
     val eventtype = ws(15)
     USGeoSurvey(id, datetime, location, magnitude, eventtype)
   }
