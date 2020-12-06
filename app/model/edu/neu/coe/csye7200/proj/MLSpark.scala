@@ -7,7 +7,7 @@ import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, exp}
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructType}
 
 /**
@@ -114,9 +114,25 @@ object MLSpark extends App{
     userInputPredictionAndLabel.collect().foreach(u => println("Predictions for User Input:\n Latitude: "+u._1
       +"\n Longitude:"+u._2+"\nPredicted Magnitude:"+u._3))
 
-    //Use case 2: Getting latitude, longitude, magnitude details and displaying the
-    //the probability of at least one earthquake occurrence above the user given magnitude
-    //TODO
+    //Use case 2: Getting latitude, longitude, magnitude, radius  and Number of years from user and displaying the
+    //the probability of at least one earthquake occurrence at the given location above the user given magnitude
+    //TODO - Code cleanup
 
+    val noOfYears = 5.0 // Number of years for which probability needs to be calculated. Hardcoded for now. Need to get user input.
+    val radius = 5.0 // Radius within user given location, where earthquake occurrences are picked up.Hardcoded for now. Need to get user input.
+    val magnitude = 3.0 //Magnitude of earthquake is hardcoded for now. Need to get user input.
+    val q = ForecasterUtil.getEarthquakes(data)
+    val ql = ForecasterUtil.getLocationArea(q, Location(67.5132, -160.9215, ""), radius) //Latitude and Longitude are hardcoded for now.Need to get user input
+    //val ql = ForecasterUtil.getLocation(q, Location(67.5132, -160.9215, ""))
+    val qlm = ForecasterUtil.filterByMagnitude(ql,magnitude)
+    val fEarthquakecount = qlm.count()
+    val earthquakeFrequency = fEarthquakecount/noOfYears
+    val probOfAtleast1Earthquake = 1 - scala.math.exp(-(earthquakeFrequency * noOfYears))
+
+    /*@Patrick. Five Inputs needed from user are 1)latitude, 2)longitude, 3)magnitude, 4)radius and 5)number of years
+    Output value to be displayed is  probOfAtleast1Earthquake */
+
+    println("The probability of having atleast one earthquake greater than magnitude of "+magnitude +" at user given location " +
+      "in next "+noOfYears+" is: "+probOfAtleast1Earthquake)
     spark.stop()
 }
