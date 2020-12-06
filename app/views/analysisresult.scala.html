@@ -1,10 +1,36 @@
 @import model.edu.neu.coe.csye7200.proj._
 @(latitude: Double, longitude: Double, result: Double)
 @main("Linear Analysis Results") {
+<section id="top">
+    <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyAE2UpXjKKqvI86_mQ37Yak8xH8YisubWg"
+            type="text/javascript"></script>
+    <style type="text/css">
+      html, body, #map { height: 500px; width: 100%; margin: 0; }
+    </style>
+    <script type="text/javascript">
+    function initialize() {
+      var map = new google.maps.Map(
+        document.getElementById('map'), {
+          center: new google.maps.LatLng(@latitude,@longitude),
+          zoom: 6,
+          mapTypeId: google.maps.MapTypeId.TERRAIN
+      });
+      var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(@latitude,@longitude),
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP,
+            title: 'Linear Regression Analysis: @result'
+      });
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+    <div id="map"</div>
+</section>
 <section id="content">
     <div class="wrapper">
         <article>
-            <h2>Linear Analysis Results</h2>
+            <h2>Linear Regression Analysis Results</h2>
             <div>
                 <table>
                     <tr>
