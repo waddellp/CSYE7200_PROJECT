@@ -1,0 +1,47 @@
+@import helper._
+@(form: Form[AnalysisForm.AnalysisData], postUrl: Call)(implicit request: MessagesRequestHeader)
+@main("Lookup") {
+<section id="content">
+    <div class="wrapper">
+        <article>
+            <h2>Linear Analysis</h2>
+            <p>
+                @helper.form(postUrl) {
+                <p style="font-size: 16px">
+                @helper.CSRF.formField
+                <style>
+                    .column {float: left;width: 33%;}
+                    .row:after {content: "";display: table;clear: both;}
+                </style>
+                <div class="row">
+                    <div class="column">
+                        @helper.inputText(
+                        form("latitude"),
+                        '_label -> "Latitude",
+                        'placeholder -> "-90 to 90",
+                        'class->"form-control",
+                        '_help -> "degrees",
+                        '_showErrors -> true)
+                    </div>
+                    <div class="column">
+                        @helper.inputText(
+                        form("longitude"),
+                        '_label -> "Longitude",
+                        'placeholder -> "-180 to 180",
+                        'class->"form-control",
+                        '_help -> "degrees",
+                        '_showErrors -> true)
+                    </div>
+                </div>
+                </p>
+                <br>
+                <button style="font-size : 18px">Analyze</button>
+                }
+            </p>
+        </article>
+        <aside>
+            @commonSidebar()
+        </aside>
+    </div>
+</section>
+}
