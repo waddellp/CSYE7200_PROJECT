@@ -45,7 +45,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
           if (valForm.hasErrors) {
             Future.successful(Ok(views.html.analysis(valForm, postUrl)))
           } else {
-            Future.successful(BadRequest)
+            Future.successful(Ok(views.html.analysisresult(formData.latitude, formData.longitude, 9999.99)))
           }
       })
   }

@@ -1,0 +1,28 @@
+@import model.edu.neu.coe.csye7200.proj._
+@(latitude: Double, longitude: Double, result: Double)
+@main("Linear Analysis Results") {
+<section id="content">
+    <div class="wrapper">
+        <article>
+            <h2>Linear Analysis Results</h2>
+            <div>
+                <table>
+                    <tr>
+                        <td><b><u>Latitude</u></b></td>
+                        <td><b><u>Longitude</u></b></td>
+                        <td><b><u>Result</u></b></td>
+                    </tr>
+                    <tr>
+                        <td>@latitude</td>
+                        <td>@longitude</td>
+                        <td>@result</td>
+                    </tr>
+                </table>
+            </div>
+        </article>
+        <aside>
+            @commonSidebar()
+        </aside>
+    </div>
+</section>
+}
