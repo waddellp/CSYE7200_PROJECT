@@ -5,8 +5,10 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructType}
 
 /**
  * Northeastern University
@@ -62,8 +64,8 @@ object MLSpark extends App{
       //.setFeaturesCol("longitude")
       //.setFeaturesCol("depth")
       //.setFeaturesCol("depthError")
-      //.setRegParam(0.3)
-      //.setElasticNetParam(0.8)
+      .setRegParam(0.001)
+      .setElasticNetParam(0.0001)
       .setMaxIter(100)
     //.setTol(1E-6)
 
@@ -71,6 +73,8 @@ object MLSpark extends App{
     val lrPredictions = lrModel.transform(testDF)
     lrPredictions.show()
 
+    println("Printing the schema of testDF")
+    testDF.printSchema()
     println(s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
 
     val trainingSummary = lrModel.summary
@@ -87,6 +91,38 @@ object MLSpark extends App{
     lrModel.transform(testDF).select("features","label", "prediction").show()
     println("***Printing only features***")
     lrModel.transform(testDF).select("features").show()
+
+
+    //Use case 1: Getting latitude, longitude details from User and displaying
+    //the probable magnitude of an earthquake occurrence
+    //TODO : User Input - To be received from UI. Hardcoded for now
+    val userInputData = Seq(Row(67.5132, -160.9215)) //Latitude and Longitude
+
+    val userInputSchema = List(
+      StructField("latitude", DoubleType, true),
+      StructField("longitude", DoubleType, true)
+    )
+
+    val userInputDF = spark.createDataFrame(spark.sparkContext.parallelize(userInputData),
+      StructType(userInputSchema))
+
+
+    val output1 = assembler1.transform(userInputDF)
+    val userInputTrainingSet = output1.randomSplit(Array(1,0))
+    val userInputDataSet1 = userInputTrainingSet(0)
+
+    val userInputPredictions = lrModel.transform(userInputDataSet1)
+
+    userInputPredictions.show()
+    //@Patrick, Please use u._3 for Predicted Magnitude output
+    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2)))
+    userInputPredictionAndLabel.collect().foreach(u => println("Predictions for User Input:\n Latitude: "+u._1
+      +"\n Longitude:"+u._2+"\nPredicted Magnitude:"+u._3))
+
+
+    //Use case 2: Getting latitude, longitude, magnitude details and displaying the
+    //the probability of at least one earthquake occurrence above the user given magnitude
+    //TODO
 
     spark.stop()
 
