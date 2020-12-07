@@ -1,7 +1,6 @@
 package controllers
 
-import java.util.Date
-
+import java.util.{Calendar, Date}
 import controllers.LookupForm.LookupData
 import play.api.data.Form
 import play.api.data.Forms._
@@ -39,9 +38,15 @@ object TopTenForm {
 
   def validateForm(form: Form[TopTenData]) = {
     val data: TopTenData = form.value.get
+    // Create calendar to validate start date
+    // Data begins at 1/1/2010
+    val c: Calendar = Calendar.getInstance()
+    c.set(Calendar.MONTH, 11)
+    c.set(Calendar.DATE, 31)
+    c.set(Calendar.YEAR, 2009)
     if (data.startDate.after(data.endDate)) {
       form.withError("startDate", "start/end date error")
-    } else if (data.startDate.before(new Date(2010,1,1))) {
+    } else if (data.startDate.before(c.getTime)) {
       form.withError("startDate", "start date must be after 1/1/2010")
     } else {
       form
