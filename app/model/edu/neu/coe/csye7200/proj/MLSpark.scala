@@ -124,7 +124,7 @@ object MLSpark extends App{
     //val ql = ForecasterUtil.getLocation(q, Location(67.5132, -160.9215, ""))
     val qlm = ForecasterUtil.filterByMagnitude(ql,magnitude)
     val fEarthquakecount = qlm.count()
-    val earthquakeFrequency = fEarthquakecount/noOfYears
+    val earthquakeFrequency = fEarthquakecount/11.0
     val probOfAtleast1Earthquake = 1 - scala.math.exp(-(earthquakeFrequency * noOfYears))
 
     println("The probability of having atleast one earthquake greater than magnitude of "+magnitude +" at user given location " +
