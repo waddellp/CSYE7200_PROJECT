@@ -38,6 +38,11 @@
             <br>
             <button style="font-size : 18px">Lookup</button>
             }
+            @if(form.hasGlobalErrors) {
+                @for(error <- form.globalErrors) {
+                    <p style="color:red">>@error.format</p>
+                }
+            }
             </p>
         </article>
         <aside>

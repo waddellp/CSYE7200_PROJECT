@@ -7,7 +7,7 @@
             <h2>Historical Lookup</h2>
             <p>Provides a historical lookup of earthquakes around a specified point and within a date range.</p>
             <p>
-                @helper.form(postUrl) {
+            @helper.form(postUrl) {
                 <p style="font-size: 16px">
                 @helper.CSRF.formField
                 <style>
@@ -66,6 +66,11 @@
                 </p>
                 <br>
                 <button style="font-size : 18px">Lookup</button>
+                }
+                @if(form.hasGlobalErrors) {
+                    @for(error <- form.globalErrors) {
+                        <p style="color:red">>@error.format</p>
+                    }
                 }
             </p>
         </article>

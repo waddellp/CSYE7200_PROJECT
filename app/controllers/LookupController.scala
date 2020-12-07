@@ -51,7 +51,7 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
               if (res.nonEmpty) {
                 Ok(views.html.lookupresult(res))
               } else {
-                BadRequest
+                BadRequest(views.html.lookup(form.withGlobalError("Error - No results found"), postUrl))
               }
             })
           }

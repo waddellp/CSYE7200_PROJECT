@@ -51,7 +51,7 @@ class TopTenController @Inject()(cc: MessagesControllerComponents, actorSystem: 
               if (res.nonEmpty && res.size >= 10) {
                 Ok(views.html.toptenresult(res.sortBy(-_._2.size).take(10)))
               } else {
-                BadRequest
+                BadRequest(views.html.topten(form.withGlobalError("Error - ten results were not found"), postUrl))
               }
             })
           }
