@@ -42,6 +42,8 @@ object ForecastForm {
     val data: ForecastData = form.value.get
     if (data.latitude < -90.0 || data.latitude > 90.0) {
       form.withError("latitude", "latitude value error")
+    } else if (data.longitude < -180.0 || data.longitude > 180.0) {
+      form.withError("longitude", "longitude value error")
     } else if (data.radius <= 0.0) {
       form.withError("radius", "radius value error")
     } else if (data.magnitude < 2.5) {
