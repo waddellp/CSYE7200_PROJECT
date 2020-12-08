@@ -1,5 +1,5 @@
 @import model.edu.neu.coe.csye7200.proj._
-@(latitude: Double, longitude: Double, result: Double)
+@(latitude: Double, longitude: Double, depth: Double, depthError: Double, result: Double)
 @main("Magnitude Linear Regression Analysis Results") {
 <section id="top">
     <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyAE2UpXjKKqvI86_mQ37Yak8xH8YisubWg"
@@ -36,11 +36,15 @@
                     <tr>
                         <td><b><u>Latitude</u></b></td>
                         <td><b><u>Longitude</u></b></td>
+                        <td><b><u>Depth</u></b></td>
+                        <td><b><u>Depth Error</u></b></td>
                         <td><b><u>Predicted Earthquake Magnitude</u></b></td>
                     </tr>
                     <tr>
                         <td>@latitude</td>
                         <td>@longitude</td>
+                        <td>@depth</td>
+                        <td>@depthError</td>
                         <td>@{"%.4f".format(result)}</td>
                     </tr>
                 </table>

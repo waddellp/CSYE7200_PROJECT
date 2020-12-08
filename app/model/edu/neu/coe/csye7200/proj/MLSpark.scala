@@ -1,9 +1,13 @@
 package model.edu.neu.coe.csye7200.proj
 
+import algebra.instances.all.catsKernelStdOrderForString
 import model.edu.neu.coe.csye7200.proj.SparkTest.{getClass, sc}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.ml.regression.LinearRegression
+import org.apache.spark.ml.feature.{StandardScaler, StringIndexer, VectorAssembler}
+import org.apache.spark.ml.regression.{DecisionTreeRegressor, GeneralizedLinearRegression, LinearRegression}
+import org.apache.spark.sql.catalyst.ScalaReflection.universe.show
+import spire.implicits.eqOps
+import org.apache.spark.ml.feature.Normalizer
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.{Row, SparkSession}
@@ -44,12 +48,13 @@ object MLSpark extends App{
 
     //Renaming mag as 'label' for convenience purpose
     val renamedDF = flattenedDF.withColumnRenamed("magnitude", "label")
+    val filteredDF = renamedDF.where(col("eventtype") === "earthquake").toDF()
 
     val assembler1 = new VectorAssembler().
-      setInputCols(Array("latitude", "longitude")).
+      setInputCols(Array("latitude", "longitude", "depth", "depthError")).
       setOutputCol("features").setHandleInvalid("skip")
 
-    val output = assembler1.transform(renamedDF)
+    val output = assembler1.transform(filteredDF)
 
     val trainingTest = output.randomSplit(Array(0.7,0.3))
     val trainingDF = trainingTest(0)
@@ -61,10 +66,13 @@ object MLSpark extends App{
       //.setFeaturesCol("longitude")
       //.setFeaturesCol("depth")
       //.setFeaturesCol("depthError")
-      .setRegParam(0.001)
-      .setElasticNetParam(0.0001)
+      .setRegParam(0.001)//0.001
+      .setElasticNetParam(0.0001)//0.0001
       .setMaxIter(100)
-    //.setTol(1E-6)
+      //.setEpsilon(100)
+      //.setAggregationDepth(100)
+      //.setFitIntercept(false)
+      .setTol(1E-24)
 
     val lrModel = lir.fit(trainingDF)
     val lrPredictions = lrModel.transform(testDF)
@@ -92,11 +100,13 @@ object MLSpark extends App{
     //Use case 1: Getting latitude, longitude details from User and displaying
     //the probable magnitude of an earthquake occurrence
     //To be received from UI. Hardcoded for now
-    val userInputData = Seq(Row(67.5132, -160.9215)) //Latitude and Longitude
+    val userInputData = Seq(Row(67.5132, -160.9215, 700.0, 8.0)) //Latitude and Longitude
 
     val userInputSchema = List(
       StructField("latitude", DoubleType, true),
-      StructField("longitude", DoubleType, true)
+      StructField("longitude", DoubleType, true),
+        StructField("depth", DoubleType, true),
+        StructField("depthError", DoubleType, true)
     )
 
     val userInputDF = spark.createDataFrame(spark.sparkContext.parallelize(userInputData),
@@ -110,9 +120,10 @@ object MLSpark extends App{
 
     userInputPredictions.show()
     //@Patrick, Please use u._3 for Predicted Magnitude output
-    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2)))
+    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","depth",
+        "depthError","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3), x.getDouble(4)))
     userInputPredictionAndLabel.collect().foreach(u => println("Predictions for User Input:\n Latitude: "+u._1
-      +"\n Longitude:"+u._2+"\nPredicted Magnitude:"+u._3))
+      +"\n Longitude:"+u._2+"\nDepth:"+u._3+"\nDepthError:"+u._4+"\nPredicted Magnitude:"+u._5))
 
     //Use case 2: Getting latitude, longitude, magnitude, radius  and Number of years from user and displaying the
     //the probability of at least one earthquake occurrence at the given location above the user given magnitude
