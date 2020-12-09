@@ -46,11 +46,16 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
           if (valForm.hasErrors) {
             Future.successful(Ok(views.html.analysis(valForm, postUrl)))
           } else {
-            Future.successful(
-              Ok(views.html.analysisresult(
-                formData.latitude, formData.longitude, formData.depth, formData.depthError,
-                linearRegAnalysis(formData.latitude, formData.longitude, formData.depth.toDouble, formData.depthError.toDouble))))
-          }
+            try {
+              val result = linearRegAnalysis(formData.latitude, formData.longitude, formData.depth.toDouble, formData.depthError.toDouble)
+              Future.successful(
+                Ok(views.html.analysisresult(
+                  formData.latitude, formData.longitude, formData.depth, formData.depthError, result)))
+            }
+            catch {
+              case e : Exception => Future.successful(BadRequest(views.html.analysis(form.withGlobalError("Error - No results found"), postUrl)))
+            }
+            }
       })
   }
 

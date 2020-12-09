@@ -5,6 +5,7 @@ import controllers.ForecastForm._
 import javax.inject._
 import model.edu.neu.coe.csye7200.proj.MLSpark.data
 import model.edu.neu.coe.csye7200.proj.{ForecasterUtil, Location, USGeoSurvey}
+import org.apache.spark.FutureAction
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.rdd.RDD
@@ -47,13 +48,19 @@ class ForecastController @Inject()(cc: MessagesControllerComponents, actorSystem
           if (valForm.hasErrors) {
             Future.successful(Ok(views.html.forecast(valForm, postUrl)))
           } else {
-            Future.successful(
-              Ok(views.html.forecastresult(
-                formData.latitude, formData.longitude, formData.radius,
-                formData.magnitude, formData.years,
-                forecastAnalysis(formData.latitude, formData.longitude, formData.radius,
-                  formData.magnitude, formData.years))))
-          }
+            try {
+              val result = forecastAnalysis(formData.latitude, formData.longitude, formData.radius,
+                formData.magnitude, formData.years)
+              Future.successful(
+                Ok(views.html.forecastresult(
+                  formData.latitude, formData.longitude, formData.radius,
+                  formData.magnitude, formData.years,
+                  result)))
+            }
+            catch {
+              case e : Exception => Future.successful(BadRequest(views.html.forecast(form.withGlobalError("Error - No results found"), postUrl)))
+            }
+            }
       })
   }
 

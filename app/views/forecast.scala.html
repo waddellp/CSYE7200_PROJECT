@@ -67,7 +67,12 @@
                 <br>
                 <button style="font-size : 18px">Analyze</button>
                 }
-            </p>
+                @if(form.hasGlobalErrors) {
+                    @for(error <- form.globalErrors) {
+                        <p style="color:red">@error.format</p>
+                    }
+                }
+                </p>
         </article>
         <aside>
             @commonSidebar()
