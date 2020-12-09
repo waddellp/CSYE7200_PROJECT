@@ -5,7 +5,7 @@
     <div class="wrapper">
         <article>
             <h2>Magnitude Linear Regression Analysis</h2>
-            <p>Estimate the magnitude of a earthquake at a user specified latitude and longitude</p>
+            <p>Estimate the magnitude of a possible earthquake at an user specified latitude, longitude and depth</p>
             <p>
                 @helper.form(postUrl) {
                 <p style="font-size: 16px">
@@ -53,6 +53,8 @@
                     }
                 }
                 </p>
+                <p>Multiple Linear Regression makes use of the empirical relationship between variables ‘Latitude’, ‘Longitude’ and ‘Depth’ to predict the ‘magnitude’ of a possible earthquake at the given location based on historical world earthquake data of 11 years.</p>
+                <p>The predicted magnitude does not conform to a particular magnitude scale, as data pertaining to all officially USGS recognised scales have been taken into account.</p>
         </article>
         <aside>
             @commonSidebar()

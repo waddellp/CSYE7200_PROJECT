@@ -5,7 +5,7 @@
     <div class="wrapper">
         <article>
             <h2>Forecast Probability Analysis</h2>
-            <p>Estimate the probability of an earthquake occurring at a user location</p>
+            <p>Estimate the probability of atleast one earthquake occurrence at an user specified location and magnitude</p>
             <p>
                 @helper.form(postUrl) {
                 <p style="font-size: 16px">
@@ -67,7 +67,15 @@
                 <br>
                 <button style="font-size : 18px">Analyze</button>
                 }
-                @if(form.hasGlobalErrors) {
+            <p> <dl> Gutenberg – Ritcher (GR) relation (1954) between magnitude and frequency (N) of earthquake events larger than magnitude (M) is made use of.</dl></p>
+            <ul>P(t)=1-e^(-N1(M)*t)</ul>
+            <br><ul>The predicted percentage denotes the probability of at least one earthquake occurrence:</ul>
+            <ul>i) At the user specified latitude and longitude coordinates</ul>
+            <ul>ii) Within the user specified radius</ul>
+            <ul>iii) Greater than or equal to the user specified magnitude</ul>
+            <ul>iv)	Within the user specified number of years</ul>
+
+            @if(form.hasGlobalErrors) {
                     @for(error <- form.globalErrors) {
                         <p style="color:red">@error.format</p>
                     }
