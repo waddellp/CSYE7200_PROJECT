@@ -23,7 +23,7 @@ object AnalysisForm {
    * Using a class specifically for form binding reduces the chances
    * of a parameter tampering attack and makes code clearer.
    */
-  case class AnalysisData(latitude: Double, longitude: Double, depth: Double, depthError: Double)
+  case class AnalysisData(latitude: Double, longitude: Double, depth: Double)
 
   /**
    * The form definition for the "create a analysis" form.
@@ -34,8 +34,7 @@ object AnalysisForm {
     mapping(
       "latitude" -> of[Double],
       "longitude" -> of[Double],
-      "depth" -> of[Double],
-      "depthError" -> of[Double]
+      "depth" -> of[Double]
     )(AnalysisData.apply)(AnalysisData.unapply)
   )
 
@@ -47,8 +46,6 @@ object AnalysisForm {
       form.withError("longitude", "longitude value error")
     } else if (data.depth < 0.0 || data.depth > 700.0) {
       form.withError("depth", "depth value error")
-    } else if (data.depthError < 0.0 || data.depthError > 10.0) {
-      form.withError("depthError", "depthError value error")
     }
     else {
       form

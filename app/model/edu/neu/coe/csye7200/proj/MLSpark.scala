@@ -51,7 +51,7 @@ object MLSpark extends App{
     val filteredDF = renamedDF.where(col("eventtype") === "earthquake").toDF()
 
     val assembler1 = new VectorAssembler().
-      setInputCols(Array("latitude", "longitude", "depth", "depthError")).
+      setInputCols(Array("latitude", "longitude", "depth")).
       setOutputCol("features").setHandleInvalid("skip")
 
     val output = assembler1.transform(filteredDF)
@@ -100,13 +100,14 @@ object MLSpark extends App{
     //Use case 1: Getting latitude, longitude details from User and displaying
     //the probable magnitude of an earthquake occurrence
     //To be received from UI. Hardcoded for now
-    val userInputData = Seq(Row(67.5132, -160.9215, 700.0, 8.0)) //Latitude and Longitude
+    //val userInputData = Seq(Row(67.5132, -160.9215, 700.0, 8.0)) //Latitude and Longitude
+    val userInputData = Seq(Row(67.5132, -160.9215, 700.0)) //Latitude and Longitude
+
 
     val userInputSchema = List(
       StructField("latitude", DoubleType, true),
       StructField("longitude", DoubleType, true),
-        StructField("depth", DoubleType, true),
-        StructField("depthError", DoubleType, true)
+        StructField("depth", DoubleType, true)
     )
 
     val userInputDF = spark.createDataFrame(spark.sparkContext.parallelize(userInputData),
@@ -120,10 +121,9 @@ object MLSpark extends App{
 
     userInputPredictions.show()
     //@Patrick, Please use u._3 for Predicted Magnitude output
-    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","depth",
-        "depthError","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3), x.getDouble(4)))
+    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","depth", "prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3)))
     userInputPredictionAndLabel.collect().foreach(u => println("Predictions for User Input:\n Latitude: "+u._1
-      +"\n Longitude:"+u._2+"\nDepth:"+u._3+"\nDepthError:"+u._4+"\nPredicted Magnitude:"+u._5))
+      +"\n Longitude:"+u._2+"\nDepth:"+u._3+ "\nPredicted Magnitude:"+u._4))
 
     //Use case 2: Getting latitude, longitude, magnitude, radius  and Number of years from user and displaying the
     //the probability of at least one earthquake occurrence at the given location above the user given magnitude

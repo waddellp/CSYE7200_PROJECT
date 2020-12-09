@@ -47,10 +47,10 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
             Future.successful(Ok(views.html.analysis(valForm, postUrl)))
           } else {
             try {
-              val result = linearRegAnalysis(formData.latitude, formData.longitude, formData.depth.toDouble, formData.depthError.toDouble)
+              val result = linearRegAnalysis(formData.latitude, formData.longitude, formData.depth.toDouble)
               Future.successful(
                 Ok(views.html.analysisresult(
-                  formData.latitude, formData.longitude, formData.depth, formData.depthError, result)))
+                  formData.latitude, formData.longitude, formData.depth, result)))
             }
             catch {
               case e : Exception => Future.successful(BadRequest(views.html.analysis(form.withGlobalError("Error - No results found"), postUrl)))
@@ -59,7 +59,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
       })
   }
 
-  def linearRegAnalysis(latitude: Double, longitude: Double, depth: Double, depthError: Double): Double= {
+  def linearRegAnalysis(latitude: Double, longitude: Double, depth: Double): Double= {
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val df = spark.createDataFrame(data).toDF()
     val flattenedDF = df.select(col("id"),
@@ -74,7 +74,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
     val filteredDF = renamedDF.where(col("eventtype") === "earthquake").toDF()
 
     val assembler1 = new VectorAssembler().
-      setInputCols(Array("latitude", "longitude", "depth", "depthError")).
+      setInputCols(Array("latitude", "longitude", "depth")).
       setOutputCol("features").setHandleInvalid("skip")
 
     val output = assembler1.transform(filteredDF)
@@ -99,12 +99,11 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
 
     //Use case 1: Getting latitude, longitude details from User and displaying
     //the probable magnitude of an earthquake occurrence
-    val userInputData = Seq(Row(latitude, longitude, depth, depthError))
+    val userInputData = Seq(Row(latitude, longitude, depth))
     val userInputSchema = List(
       StructField("latitude", DoubleType, true),
       StructField("longitude", DoubleType, true),
-      StructField("depth", DoubleType, true),
-      StructField("depthError", DoubleType, true)
+      StructField("depth", DoubleType, true)
     )
     val userInputDF = spark.createDataFrame(sc.parallelize(userInputData),
       StructType(userInputSchema))
@@ -113,7 +112,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
     val userInputDataSet1 = userInputTrainingSet(0)
     val userInputPredictions = lrModel.transform(userInputDataSet1)
 
-    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","depth","depthError","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3), x.getDouble(4)))
-    userInputPredictionAndLabel.collect().toSeq.head._5
+    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","depth","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3)))
+    userInputPredictionAndLabel.collect().toSeq.head._4
   }
 }
