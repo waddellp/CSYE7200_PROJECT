@@ -3,14 +3,8 @@ package controllers
 import akka.actor.ActorSystem
 import controllers.ForecastForm._
 import javax.inject._
-import model.edu.neu.coe.csye7200.proj.MLSpark.data
 import model.edu.neu.coe.csye7200.proj.{ForecasterUtil, Location, USGeoSurvey}
-import org.apache.spark.FutureAction
-import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
 import play.api.mvc._
 
@@ -37,7 +31,7 @@ class ForecastController @Inject()(cc: MessagesControllerComponents, actorSystem
   }
 
   /**
-   * Creates an Action that returns a Sequence of US Geological Survey data
+   * Creates an Action that returns of forecast analysis involving probability of earthquake occurrence
    */
   def forecastPost = Action.async { implicit request =>
     form.bindFromRequest.fold(
@@ -68,9 +62,9 @@ class ForecastController @Inject()(cc: MessagesControllerComponents, actorSystem
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val q = ForecasterUtil.getEarthquakes(data)
     val ql = ForecasterUtil.getLocationArea(q, Location(latitude, longitude, ""), radius)
-    val qlm = ForecasterUtil.filterByMagnitude(ql,magnitude)
+    val qlm = ForecasterUtil.filterByMagnitude(ql, magnitude)
     val fEarthquakecount = qlm.count()
-    val earthquakeFrequency = fEarthquakecount/11.0 //11.0 is used since ll year data is considered for analysis
+    val earthquakeFrequency = fEarthquakecount / 11.0 //11.0 is used since ll year data is considered for analysis
     val probOfAtleast1Earthquake = 1 - scala.math.exp(-(earthquakeFrequency * years))
     probOfAtleast1Earthquake
   }

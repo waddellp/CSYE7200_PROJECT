@@ -35,7 +35,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
   }
 
   /**
-   * Creates an Action that returns a Sequence of US Geological Survey data
+   * Creates an Action that returns the result of linear regression analysis involving magnitude
    */
   def analysisPost = Action.async { implicit request =>
     form.bindFromRequest.fold(
@@ -59,7 +59,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
       })
   }
 
-  def linearRegAnalysis(latitude: Double, longitude: Double, depth: Double): Double= {
+  def linearRegAnalysis(latitude: Double, longitude: Double, depth: Double): Double = {
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val df = spark.createDataFrame(data).toDF()
     val flattenedDF = df.select(col("id"),
@@ -73,29 +73,27 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
     val renamedDF = flattenedDF.withColumnRenamed("magnitude", "label")
     val filteredDF = renamedDF.where(col("eventtype") === "earthquake").toDF()
 
+    /*Picking 'latitude', 'longitude' and 'depth' are input predictor variables
+    Composing a vectorassembler involving all predictor variables and giving the name as 'Features'*/
     val assembler1 = new VectorAssembler().
       setInputCols(Array("latitude", "longitude", "depth")).
       setOutputCol("features").setHandleInvalid("skip")
 
     val output = assembler1.transform(filteredDF)
 
-    val trainingTest = output.randomSplit(Array(0.7,0.3))
+    //Randomly Splitting the input dataset into trainingdatset(70%) and testdataset(30%)
+    val trainingTest = output.randomSplit(Array(0.7, 0.3))
     val trainingDF = trainingTest(0)
-    val testDF = trainingTest(1)
 
+    //Performing Linear Regression
     val lir = new LinearRegression()
-      //.setLabelCol("mag")
-      //.setFeaturesCol("latitude")
-      //.setFeaturesCol("longitude")
-      //.setFeaturesCol("depth")
-      //.setFeaturesCol("depthError")
+
       .setRegParam(0.001)
       .setElasticNetParam(0.0001)
       .setMaxIter(100)
       .setTol(1E-24)
 
     val lrModel = lir.fit(trainingDF)
-    val lrPredictions = lrModel.transform(testDF)
 
     //Use case 1: Getting latitude, longitude details from User and displaying
     //the probable magnitude of an earthquake occurrence
@@ -108,11 +106,11 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
     val userInputDF = spark.createDataFrame(sc.parallelize(userInputData),
       StructType(userInputSchema))
     val output1 = assembler1.transform(userInputDF)
-    val userInputTrainingSet = output1.randomSplit(Array(1,0))
+    val userInputTrainingSet = output1.randomSplit(Array(1, 0))
     val userInputDataSet1 = userInputTrainingSet(0)
     val userInputPredictions = lrModel.transform(userInputDataSet1)
 
-    val userInputPredictionAndLabel = userInputPredictions.select("latitude","longitude","depth","prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3)))
+    val userInputPredictionAndLabel = userInputPredictions.select("latitude", "longitude", "depth", "prediction").rdd.map(x => (x.getDouble(0), x.getDouble(1), x.getDouble(2), x.getDouble(3)))
     userInputPredictionAndLabel.collect().toSeq.head._4
   }
 }
