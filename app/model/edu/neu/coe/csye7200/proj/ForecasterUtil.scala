@@ -4,6 +4,7 @@ import java.io.{InputStream, SequenceInputStream}
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
+import play.api.Play
 
 import scala.collection.JavaConverters.asJavaEnumeration
 import scala.io.Source
@@ -27,19 +28,19 @@ object ForecasterUtil {
    */
   def loadData(sc: SparkContext): RDD[USGeoSurvey] = {
     val parser = new DataParse[USGeoSurvey]()
-    val files: Seq[InputStream] =
-      Vector(
-        Source.getClass.getResourceAsStream("/data/USGS-2020.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2019.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2018.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2017.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2016.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2015.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2014.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2013.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2012.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2011.csv"),
-        Source.getClass.getResourceAsStream("/data/USGS-2010.csv"))
+    val files =
+      Seq(
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2020.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2019.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2018.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2017.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2016.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2015.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2014.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2013.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2012.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2011.csv"),
+        play.Environment.simple().classLoader().getResourceAsStream("data/USGS-2010.csv"))
     val filestream = new SequenceInputStream(asJavaEnumeration(files.toIterator))
     sc.parallelize(Source.fromInputStream(filestream).getLines().toSeq map (u => parser(u)), numSlices=10) flatMap (_.toOption)
   }
