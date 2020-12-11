@@ -58,6 +58,12 @@ class TopTenController @Inject()(cc: MessagesControllerComponents, actorSystem: 
       })
   }
 
+  /**
+   * Displays the information about top 10 earthquake locations based on user input start date and end date
+   *
+   * @param formData TopTenData
+   * @return Search results based on values provided for user input start date and end date
+   */
   private def getFutureUSGS(formData: TopTenData): FutureAction[Seq[(String, Seq[USGeoSurvey])]] = {
     val cal = Calendar.getInstance()
     cal.setTime(formData.startDate)

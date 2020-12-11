@@ -112,18 +112,4 @@ object ForecasterUtil {
   def filterByMagnitude(earthquakes: RDD[USGeoSurvey], magnitude:Double): RDD[USGeoSurvey] = {
     earthquakes filter (u => u.magnitude.magnitude >= magnitude)
   }
-
-  /**
-   * Method to get a list of US Geological Survey data that is only of type 'earthquake' and which corresponds to the
-   * location provided as input
-   *
-   * @param earthquakes the US Geological Survey data earthquake list
-   * @param location    the location from which to search around
-   * @return a try of sequence of USGeoSurvey data
-   * TODO - Will be removed post confirmation
-   */
-  def getLocation(earthquakes: RDD[USGeoSurvey], location: Location): RDD[USGeoSurvey] = {
-    earthquakes filter (u => (u.location.latitude == location.latitude) && (u.location.longitude == location.longitude))
-  }
-
 }

@@ -59,6 +59,15 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
       })
   }
 
+  /**
+   * Performs multiple linear regression on the input dataset and predicts the magnitude of a possible earthquake
+   * occurrence at the user provided latitude, longitude and depth
+   *
+   * @param latitude  the latitude of the earthquake occurrence
+   * @param longitude the longitude of the earthquake occurrence
+   * @param depth     the depth of the earthquake occurrence
+   * @return Predicted magnitude of the possible earthquake occurrence
+   */
   def linearRegAnalysis(latitude: Double, longitude: Double, depth: Double): Double = {
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val df = spark.createDataFrame(data).toDF()
@@ -73,7 +82,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
     val renamedDF = flattenedDF.withColumnRenamed("magnitude", "label")
     val filteredDF = renamedDF.where(col("eventtype") === "earthquake").toDF()
 
-    /*Picking 'latitude', 'longitude' and 'depth' are input predictor variables
+    /*Picking 'latitude', 'longitude' and 'depth' as input predictor variables
     Composing a vectorassembler involving all predictor variables and giving the name as 'Features'*/
     val assembler1 = new VectorAssembler().
       setInputCols(Array("latitude", "longitude", "depth")).
@@ -103,6 +112,7 @@ class AnalysisController @Inject()(cc: MessagesControllerComponents, actorSystem
       StructField("longitude", DoubleType, true),
       StructField("depth", DoubleType, true)
     )
+    //Creating a dataframe with the user input values
     val userInputDF = spark.createDataFrame(sc.parallelize(userInputData),
       StructType(userInputSchema))
     val output1 = assembler1.transform(userInputDF)

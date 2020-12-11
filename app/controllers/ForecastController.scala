@@ -58,6 +58,17 @@ class ForecastController @Inject()(cc: MessagesControllerComponents, actorSystem
       })
   }
 
+  /**
+   * Performs multiple linear regression on the input dataset and predicts the magnitude of a possible earthquake
+   * occurrence at the user provided latitude, longitude and depth
+   *
+   * @param latitude  the latitude of the earthquake occurrence
+   * @param longitude the longitude of the earthquake occurrence
+   * @param radius    the radius within the user provided latitude and longitude
+   * @param magnitude the magnitude of the earthquake occurrence
+   * @param years     the number of years within which the probability needs to be calculated
+   * @return Probability percentage of at least one possible earthquake occurrence
+   */
   def forecastAnalysis(latitude: Double, longitude: Double, radius: Double, magnitude: Double, years: Int): Double = {
     val data: RDD[USGeoSurvey] = ForecasterUtil.loadData(sc)
     val q = ForecasterUtil.getEarthquakes(data)

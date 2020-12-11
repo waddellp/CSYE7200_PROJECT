@@ -114,6 +114,9 @@ object DateTime {
  * Case class - The magnitude data associated with the US Geological Survey seismic data
  * @param magnitude the magnitude of the seismic event
  * @param units the unit of measurement for the magnitude
+ * @param depth the depth of the seismic event
+ * @param magError the error value in magnitude of the seismic event
+ * @param depthError the error value in depth of the seismic event
  */
 case class Magnitude(magnitude: Double, units: String, depth: Double, magError: Double, depthError: Double) {
   override def toString: String = { s"$magnitude[$units],$depth[km],$magError,$depthError" }

@@ -58,6 +58,12 @@ class LookupController @Inject()(cc: MessagesControllerComponents, actorSystem: 
       })
   }
 
+  /**
+   * Performs a lookup into the dataset based on values provided for user input search parameters
+   *
+   * @param formData Lookup data
+   * @return Search results based on values provided for user input search parameters
+   */
   private def getFutureUSGS(formData: LookupData): FutureAction[Seq[USGeoSurvey]] = {
     val cal = Calendar.getInstance()
     cal.setTime(formData.startDate)
