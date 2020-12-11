@@ -14,8 +14,11 @@ import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructT
  * Northeastern University
  * CSYE 7200 - Big Data System Engineering Using Scala
  * Project: World Earthquake Forecaster
- * This class holds the entire  Machine Learning code, which is later being used in
- * AnalysisController and ForcastController classes
+ * This is actually a testing ground for Multiple Linear regression code, where the model was created, trained and tested with hardcoded inputs for
+ * two input cases. ML code directly working on actual user inputs from UI through Scala Play is included in AnalysisController and ForecastController.
+ * However, this file is also used for:
+ * 1. Determination of accuracy parameters for the model
+ * 2. Execution of tests to confirm that assumptions for linear regression model were true
  *
  * @author Patrick Waddell [001058235]
  * @author Rajendra kumar Rajkumar [001405755]
@@ -73,17 +76,9 @@ object MLSpark extends App {
   val testDF = trainingTest(1)
 
   val lir = new LinearRegression()
-    //.setLabelCol("mag")
-    //.setFeaturesCol("latitude")
-    //.setFeaturesCol("longitude")
-    //.setFeaturesCol("depth")
-    //.setFeaturesCol("depthError")
-    .setRegParam(0.001) //0.001
-    .setElasticNetParam(0.0001) //0.0001
+    .setRegParam(0.001)
+    .setElasticNetParam(0.0001)
     .setMaxIter(100)
-    //.setEpsilon(100)
-    //.setAggregationDepth(100)
-    //.setFitIntercept(false)
     .setTol(1E-24)
 
   val lrModel = lir.fit(trainingDF)
@@ -111,10 +106,9 @@ object MLSpark extends App {
   lrModel.transform(testDF).select("features", "label", "prediction").show()
 
 
-  //Use case 1: Getting latitude, longitude details from User and displaying
+  //Test Use case 1(with hardcoded inputs): Getting latitude, longitude details from User and displaying
   //the probable magnitude of an earthquake occurrence
   //To be received from UI. Hardcoded for now
-  //val userInputData = Seq(Row(67.5132, -160.9215, 700.0, 8.0)) //Latitude and Longitude
   val userInputData = Seq(Row(67.5132, -160.9215, 700.0)) //Latitude and Longitude
 
 
@@ -138,13 +132,13 @@ object MLSpark extends App {
   userInputPredictionAndLabel.collect().foreach(u => println("\nPredictions for User Input:\n Latitude: " + u._1
     + "\n Longitude:" + u._2 + "\nDepth:" + u._3 + "\nPredicted Magnitude:" + u._4))
 
-  //Use case 2: Getting latitude, longitude, magnitude, radius  and Number of years from user and displaying the
+  //Use case 2 (with hardcoded inputs): Getting latitude, longitude, magnitude, radius  and Number of years from user and displaying the
   //the probability of at least one earthquake occurrence at the given location above the user given magnitude
   val noOfYears = 5.0 // Number of years for which probability needs to be calculated. Hardcoded for now. Need to get user input.
   val radius = 5.0 // Radius within user given location, where earthquake occurrences are picked up.Hardcoded for now. Need to get user input.
   val magnitude = 3.0 //Magnitude of earthquake is hardcoded for now. Need to get user input.
   val q = ForecasterUtil.getEarthquakes(data)
-  val ql = ForecasterUtil.getLocationArea(q, Location(67.5132, -160.9215, ""), radius) //Latitude and Longitude are hardcoded for now.Need to get user input
+  val ql = ForecasterUtil.getLocationArea(q, Location(38.575764, -121.478851, ""), radius) //Latitude and Longitude are hardcoded for now.Need to get user input
   val qlm = ForecasterUtil.filterByMagnitude(ql, magnitude)
   val fEarthquakecount = qlm.count()
   val earthquakeFrequency = fEarthquakecount / 11.0
